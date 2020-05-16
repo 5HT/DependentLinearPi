@@ -1,5 +1,5 @@
 open import Session_Types
-open import Pi_Types
+open import Pi_Encoding
 open import Data.Fin as Fin
 open import Data.Nat as Nat
 open import Data.Bool

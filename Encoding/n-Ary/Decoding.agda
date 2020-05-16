@@ -1,4 +1,4 @@
-open import Pi_Types
+open import Pi_Encoding
 open import Session_Types
 open import Data.Product
 open import Common

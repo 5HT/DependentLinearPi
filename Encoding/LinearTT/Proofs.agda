@@ -1,5 +1,5 @@
 open import LTTypes
-open import Pi_Types
+open import Pi_Encoding
 open import Encode
 open import Decode
 open import Data.Product
@@ -14,53 +14,53 @@ enc-dec : ∀ S b → S ≋ ⌈ enc-Enc S b , b ⌉
 enc-dec End _ = refl End
 enc-dec ($ x) _ = refl ($ x)
 enc-dec (End ⊸ S₁) false = in-in (refl End) (enc-dec S₁ false)
-enc-dec (($ x) ⊸ S₁) false = impl-ex (enc-dec S₁ false)
+enc-dec (($ x) ⊸ S₁) false = impl-all (enc-dec S₁ false)
 enc-dec ((S ⊸ S₂) ⊸ S₁) false = in-in (enc-dec (S ⊸ S₂) false) (enc-dec S₁ false)
 enc-dec ((S ⨂ S₂) ⊸ S₁) false = in-in (enc-dec (S ⨂ S₂) false) (enc-dec S₁ false)
 enc-dec ((S & S₂) ⊸ S₁) false = in-in (enc-dec (S & S₂) false) (enc-dec S₁ false)
 enc-dec ((S ⨁ S₂) ⊸ S₁) false = in-in (enc-dec (S ⨁ S₂) false) (enc-dec S₁ false)
-enc-dec ((All τ # x) ⊸ S₁) false = in-in (enc-dec (All τ # x) false) (enc-dec S₁ false)
 enc-dec ((Ex τ # x) ⊸ S₁) false = in-in (enc-dec (Ex τ # x) false) (enc-dec S₁ false)
+enc-dec ((All τ # x) ⊸ S₁) false = in-in (enc-dec (All τ # x) false) (enc-dec S₁ false)
 enc-dec (End ⊸ S₁) true = in-in (refl End) (enc-dec S₁ false)
-enc-dec (($ x) ⊸ S₁) true = impl-ex (enc-dec S₁ false)
+enc-dec (($ x) ⊸ S₁) true = impl-all (enc-dec S₁ false)
 enc-dec ((S ⊸ S₂) ⊸ S₁) true = in-in (enc-dec (S ⊸ S₂) false) (enc-dec S₁ false)
 enc-dec ((S ⨂ S₂) ⊸ S₁) true = in-in (enc-dec (S ⨂ S₂) false) (enc-dec S₁ false)
 enc-dec ((S & S₂) ⊸ S₁) true = in-in (enc-dec (S & S₂) false) (enc-dec S₁ false)
 enc-dec ((S ⨁ S₂) ⊸ S₁) true = in-in (enc-dec (S ⨁ S₂) false) (enc-dec S₁ false)
-enc-dec ((All τ # x) ⊸ S₁) true = in-in (enc-dec (All τ # x) false) (enc-dec S₁ false)
 enc-dec ((Ex τ # x) ⊸ S₁) true = in-in (enc-dec (Ex τ # x) false) (enc-dec S₁ false)
+enc-dec ((All τ # x) ⊸ S₁) true = in-in (enc-dec (All τ # x) false) (enc-dec S₁ false)
 enc-dec (End ⨂ S₁) false = out-out (refl End) (enc-dec S₁ true)
-enc-dec (($ x) ⨂ S₁) false = tens-all (enc-dec S₁ true)
+enc-dec (($ x) ⨂ S₁) false = tens-ex (enc-dec S₁ true)
 enc-dec ((S ⊸ S₂) ⨂ S₁) false = out-out (enc-dec (S ⊸ S₂) false) (enc-dec S₁ true)
 enc-dec ((S ⨂ S₂) ⨂ S₁) false = out-out (enc-dec (S ⨂ S₂) false) (enc-dec S₁ true)
 enc-dec ((S & S₂) ⨂ S₁) false = out-out (enc-dec (S & S₂) false) (enc-dec S₁ true)
 enc-dec ((S ⨁ S₂) ⨂ S₁) false = out-out (enc-dec (S ⨁ S₂) false) (enc-dec S₁ true)
-enc-dec ((All τ # x) ⨂ S₁) false = out-out (enc-dec (All τ # x) false) (enc-dec S₁ true)
 enc-dec ((Ex τ # x) ⨂ S₁) false = out-out (enc-dec (Ex τ # x) false) (enc-dec S₁ true)
+enc-dec ((All τ # x) ⨂ S₁) false = out-out (enc-dec (All τ # x) false) (enc-dec S₁ true)
 enc-dec (End ⨂ S₁) true = out-out (refl End) (enc-dec S₁ true)
-enc-dec (($ x) ⨂ S₁) true = tens-all (enc-dec S₁ true)
+enc-dec (($ x) ⨂ S₁) true = tens-ex (enc-dec S₁ true)
 enc-dec ((S ⊸ S₂) ⨂ S₁) true = out-out (enc-dec (S ⊸ S₂) false) (enc-dec S₁ true)
 enc-dec ((S ⨂ S₂) ⨂ S₁) true = out-out (enc-dec (S ⨂ S₂) false) (enc-dec S₁ true)
 enc-dec ((S & S₂) ⨂ S₁) true = out-out (enc-dec (S & S₂) false) (enc-dec S₁ true)
 enc-dec ((S ⨁ S₂) ⨂ S₁) true = out-out (enc-dec (S ⨁ S₂) false) (enc-dec S₁ true)
-enc-dec ((All τ # x) ⨂ S₁) true = out-out (enc-dec (All τ # x) false) (enc-dec S₁ true)
 enc-dec ((Ex τ # x) ⨂ S₁) true = out-out (enc-dec (Ex τ # x) false) (enc-dec S₁ true)
+enc-dec ((All τ # x) ⨂ S₁) true = out-out (enc-dec (All τ # x) false) (enc-dec S₁ true)
 enc-dec (S & S₁) false =
-  let aux = with-ex (enc-dec S false) (enc-dec S₁ false) in
-  subst (λ x → (S & S₁) ≋ (Ex Bool # x)) (extensionality λ {false → refl ; true → refl}) aux
+  let aux = with-all (enc-dec S false) (enc-dec S₁ false) in
+  subst (λ x → (S & S₁) ≋ (All Bool # x)) (extensionality λ {false → refl ; true → refl}) aux
 enc-dec (S & S₁) true =
-  let aux = with-ex (enc-dec S false) (enc-dec S₁ false) in
-  subst (λ x → (S & S₁) ≋ (Ex Bool # x)) (extensionality λ {false → refl ; true → refl}) aux
+  let aux = with-all (enc-dec S false) (enc-dec S₁ false) in
+  subst (λ x → (S & S₁) ≋ (All Bool # x)) (extensionality λ {false → refl ; true → refl}) aux
 enc-dec (S ⨁ S₁) false =
-  let aux = plus-all (enc-dec S true) (enc-dec S₁ true) in
-  subst (λ x → (S ⨁ S₁) ≋ (All Bool # x)) (extensionality λ {false → refl ; true → refl}) aux
+  let aux = plus-ex (enc-dec S true) (enc-dec S₁ true) in
+  subst (λ x → (S ⨁ S₁) ≋ (Ex Bool # x)) (extensionality λ {false → refl ; true → refl}) aux
 enc-dec (S ⨁ S₁) true =
-  let aux = plus-all (enc-dec S true) (enc-dec S₁ true) in
-  subst (λ x → (S ⨁ S₁) ≋ (All Bool # x)) (extensionality λ {false → refl ; true → refl}) aux
-enc-dec (All τ # x) false = all-all λ x₁ → enc-dec (x x₁) true
-enc-dec (All τ # x) true = all-all λ x₁ → enc-dec (x x₁) true
-enc-dec (Ex τ # x) false = ex-ex λ x₁ → enc-dec (x x₁) false
-enc-dec (Ex τ # x) true = ex-ex λ x₁ → enc-dec (x x₁) false
+  let aux = plus-ex (enc-dec S true) (enc-dec S₁ true) in
+  subst (λ x → (S ⨁ S₁) ≋ (Ex Bool # x)) (extensionality λ {false → refl ; true → refl}) aux
+enc-dec (Ex τ # x) false = ex-ex λ x₁ → enc-dec (x x₁) true
+enc-dec (Ex τ # x) true = ex-ex λ x₁ → enc-dec (x x₁) true
+enc-dec (All τ # x) false = all-all λ x₁ → enc-dec (x x₁) false
+enc-dec (All τ # x) true = all-all λ x₁ → enc-dec (x x₁) false
 
 dec-enc : ∀{t} → (enc : Encoding t) → (b : Bool) → t ≡ ⌊ ⌈ enc , b ⌉ , b ⌋
 dec-enc unit _ = refl

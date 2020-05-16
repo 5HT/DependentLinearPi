@@ -1,8 +1,7 @@
-
 open import Data.Nat
 open import Data.Bool
 open import LDSTypes
-open import Pi_Types
+open import Pi_Encoding
 open import Encode
 open import Relation.Binary.PropositionalEquality
 open import Common

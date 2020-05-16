@@ -1,6 +1,6 @@
 open import Encoding
 open import Decoding
-open import Pi_Types
+open import Pi_Encoding
 open import Session_Types
 open import Common
 open import Relation.Binary.PropositionalEquality

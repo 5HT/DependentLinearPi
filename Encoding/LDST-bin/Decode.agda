@@ -1,4 +1,4 @@
-open import Pi_Types
+open import Pi_Encoding
 open import LDSTypes
 open import Data.Nat
 open import Data.Product

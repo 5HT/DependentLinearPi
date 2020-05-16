@@ -1,35 +1,9 @@
-open import Size
-open import Codata.Thunk
-open import Data.Product
+open import Common
 open import Data.Unit
-open import Data.Vec
 open import Data.Fin
-open import Data.Nat as Nat
 open import Relation.Binary.PropositionalEquality
 
-module Pi_Types where
-
-{- MULTIPLICITY -}
-
-data Multiplicity : Set where
-  #0 #1 #ω : Multiplicity
-
-{- TYPE -}
-
-mutual
-  data PreType : Set₁ where
-    Pure : (A : Set) -> PreType
-    Chan : Multiplicity → Multiplicity → PreType → PreType
-    Pair : ∀(t : PreType) -> (f : ⟦ t ⟧ → PreType) → PreType
-
-  {- Interpretation : datatype → type -}
-  ⟦_⟧ : PreType → Set
-  ⟦ Pure A ⟧     = A
-  ⟦ Chan _ _ _ ⟧ = ⊤
-  ⟦ Pair t f ⟧   = Σ ⟦ t ⟧ λ x -> ⟦ f x ⟧
-
-πType : Set₁
-πType = PreType
+module Pi_Encoding where
 
 {- ##### πEncoding ##### -}
 
@@ -59,8 +33,6 @@ data _∥π_ : πType → πType → Set where
 -- Involutory
 ∥π-inv : ∀{T T' T''} → T ∥π T' → T' ∥π T'' → T ≡ T''
 ∥π-inv flip flip = refl
-
-
 
 
 flip-mul : πType → πType

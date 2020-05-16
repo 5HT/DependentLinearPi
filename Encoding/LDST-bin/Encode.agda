@@ -1,4 +1,5 @@
-open import Pi_Types as PI
+open import Pi_Encoding as PI
+open import Common
 open import LDSTypes as LDST
 open import Data.Unit
 open import Data.List

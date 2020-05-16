@@ -6,7 +6,7 @@ open import Data.Vec as Vec
 open import Relation.Binary.PropositionalEquality
 open import Data.Fin
 
-open import Pi_Types
+open import Pi_Encoding
 
 module Session_Types where
 

@@ -1,5 +1,5 @@
 open import LDSTypes
-open import Pi_Types
+open import Pi_Encoding
 open import Encode
 open import Decode
 open import Data.Product
