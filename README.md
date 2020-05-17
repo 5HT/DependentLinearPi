@@ -56,14 +56,13 @@ outline of the files and of their purpose:
 * [Weakening.agda](DLPi/Weakening.agda) Definition of `Weaken` and
   weakening properties for terms and processes.
 
-## Encodings
+## Dependent Session Type Encodings
 
-This folder contains **encoding** functions from two dependent
-session type languages to DLπ types. The folder is organized as
-follows:
+This folder contains **encoding** functions from dependent session
+type languages to DLπ types. The folder is organized as follows:
 
 * [Common.agda](SessionTypes/Common.agda) imports the extensionality
-  principles and defines a data type for **finite DLπ types**.
+  principle and defines a data type for **finite DLπ types**.
 * [LinearLogic](SessionTypes/LinearLogic) defines the encoding from
   dependent session types *à la* Toninho, Caires &
   Pfenning 2011. These session types subsume the original
