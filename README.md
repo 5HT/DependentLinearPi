@@ -64,12 +64,13 @@ type languages to DLπ types. The folder is organized as follows:
 * [Common.agda](SessionTypes/Common.agda) imports the extensionality
   principle and defines a data type for **finite DLπ types**.
 * [LinearLogic](SessionTypes/LinearLogic) defines the encoding from
-  dependent session types *à la* Toninho, Caires &
-  Pfenning 2011. These session types subsume the original
-  non-dependent ones by Honda.
+  dependent session types *à la* [Toninho, Caires & Pfenning
+  2011](https://doi.org/10.1145/2003476.2003499). These session
+  types subsume the original non-dependent ones by
+  [Honda](https://doi.org/10.1007/3-540-57208-2_35).
 * [LabelDependent](SessionTypes/LabelDependent) defines the encoding
-  from label-dependent session types defined by Thiemann &
-  Vasconcelos 2020.
+  from label-dependent session types defined by [Thiemann &
+  Vasconcelos 2020](https://doi.org/10.1145/3371135).
 
 Each subfolder is organized as follows:
 
