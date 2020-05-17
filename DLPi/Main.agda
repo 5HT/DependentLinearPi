@@ -37,7 +37,7 @@ open import Codata.Thunk
 open import ReducibleNormalForm
 open import Data.Product
 
-{- SERVER CHE CALCOLA IL SUCCESSORE DI UN NUMERO -}
+{- SERVER THAT COMPUTES THE SUCCESSOR OF A NATURAL NUMBER -}
 successor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ))) # _ :: [])
 successor =
   Rep (scale-c scale1ω scale00 :: [])
@@ -51,7 +51,7 @@ successor =
                                            (suc x)))
             )
 
-{- SERVER CHE CALCOLA IL PREDECESSORE DI UN NUMERO NON NULLO -}
+{- SERVER THAT COMPUTES THE PREDECESSOR OF A NON-NULL NATURAL NUMBER -}
 predecessor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Pair (Pure (n ≢ 0)) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ)))) # _ :: [])
 predecessor =
   Rep (scale-c scale1ω scale00 :: [])
@@ -81,7 +81,7 @@ send-type = Chan #0 #1 (λ where .force -> Pair (Pure ℕ) (λ n -> Chan #1 #0 (
 recv-type : ∀{i} -> PreType i
 recv-type = Chan #1 #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Chan #1 #0 (data-type n)))
 
-{- PROCESSO CHE INVIA N SEGUITO DA N MESSAGGI -}
+{- PROCESSO THAT SENDS N FOLLOWED BY N MESSAGES -}
 
 send-data : ∀{Γ}(n : ℕ) -> CNull Γ -> Process (Chan #0 #1 (data-type n) # _ :: Γ)
 send-data zero null =
@@ -107,7 +107,7 @@ send n =
                        (var (var-here (null-c :: [])))))
            (send-data n (null-c :: [])))
 
-{- PROCESSO CHE RICEVE N SEGUITO DA N MESSAGGI -}
+{- PROCESS THAT RECEIVES N FOLLOWED BY N MESSAGES -}
 
 recv-data : ∀{Γ} -> CNull Γ -> (n : ℕ) -> Process (Chan #1 #0 (data-type n) # _ :: Γ)
 recv-data null zero =
