@@ -1,11 +1,29 @@
-open import Pi_Encoding
-open import LTTypes
+{- This file is part of DLπ.                                         -}
+{-                                                                   -}
+{- DLπ is free software: you can redistribute it and/or modify it    -}
+{- under the terms of the GNU General Public License as published by -}
+{- the Free Software Foundation, either version 3 of the License, or -}
+{- (at your option) any later version.                               -}
+{-                                                                   -}
+{- DLπ is distributed in the hope that it will be useful, but        -}
+{- WITHOUT ANY WARRANTY; without even the implied warranty of        -}
+{- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU -}
+{- General Public License for more details.                          -}
+{-                                                                   -}
+{- You should have received a copy of the GNU General Public License -}
+{- along with DLπ.  If not, see <https://www.gnu.org/licenses/>.     -}
+{-                                                                   -}
+{- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
+
 open import Data.Nat
 open import Data.Product
 open import Data.Bool
 open import Data.Unit
 
-module Decode where
+open import SessionTypes.LinearLogic.Types
+open import SessionTypes.LinearLogic.Encoding
+
+module SessionTypes.LinearLogic.Decode where
 
 ⌈_,_⌉ : ∀{t} → Encoding t → Bool → SessionType
 ⌈ unit , _ ⌉ = End

@@ -1,11 +1,31 @@
+{- This file is part of DLπ.                                         -}
+{-                                                                   -}
+{- DLπ is free software: you can redistribute it and/or modify it    -}
+{- under the terms of the GNU General Public License as published by -}
+{- the Free Software Foundation, either version 3 of the License, or -}
+{- (at your option) any later version.                               -}
+{-                                                                   -}
+{- DLπ is distributed in the hope that it will be useful, but        -}
+{- WITHOUT ANY WARRANTY; without even the implied warranty of        -}
+{- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU -}
+{- General Public License for more details.                          -}
+{-                                                                   -}
+{- You should have received a copy of the GNU General Public License -}
+{- along with DLπ.  If not, see <https://www.gnu.org/licenses/>.     -}
+{-                                                                   -}
+{- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
+
 open import Data.Nat
 open import Data.Bool
-open import LDSTypes
-open import Pi_Encoding
-open import Encode
-open import Relation.Binary.PropositionalEquality
-open import Common
 open import Data.List
+open import Relation.Binary.PropositionalEquality
+
+open import SessionTypes.Common
+open import SessionTypes.LabelDependent.Types
+open import SessionTypes.LabelDependent.Encode
+open import SessionTypes.LabelDependent.Encoding
+
+module SessionTypes.LabelDependent.Equalities where
 
 example1 : SessionType -> SessionType -> SessionType
 example1 S T = ¿ Boolean , (case 0 of (¿ (Session S) , T ) , (¿ (Session S) , T))
@@ -14,7 +34,7 @@ example2 : SessionType -> SessionType -> SessionType
 example2 S T = ¿ Boolean , (¿ (Session S) , (case 0 of T , T))
 
 mutual
-  shift-t : Type -> Type
+  shift-t : MessageType -> MessageType
   shift-t (Session T) = Session (shift-st T)
   shift-t Boolean = Boolean
 

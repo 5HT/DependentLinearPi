@@ -1,19 +1,37 @@
-open import Pi_Encoding as PI
-open import Common
-open import LDSTypes as LDST
+{- This file is part of DLπ.                                         -}
+{-                                                                   -}
+{- DLπ is free software: you can redistribute it and/or modify it    -}
+{- under the terms of the GNU General Public License as published by -}
+{- the Free Software Foundation, either version 3 of the License, or -}
+{- (at your option) any later version.                               -}
+{-                                                                   -}
+{- DLπ is distributed in the hope that it will be useful, but        -}
+{- WITHOUT ANY WARRANTY; without even the implied warranty of        -}
+{- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU -}
+{- General Public License for more details.                          -}
+{-                                                                   -}
+{- You should have received a copy of the GNU General Public License -}
+{- along with DLπ.  If not, see <https://www.gnu.org/licenses/>.     -}
+{-                                                                   -}
+{- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
+
 open import Data.Unit
 open import Data.List
 open import Data.Bool
 open import Data.Product
 
-module Encode where
+open import SessionTypes.Common
+open import SessionTypes.LabelDependent.Encoding
+open import SessionTypes.LabelDependent.Types
+
+module SessionTypes.LabelDependent.Encode where
 
 mutual
-  ⌊_,_⌋-base : ∀{Γ t} → Env Γ → WFT Γ t → πType
+  ⌊_,_⌋-base : ∀{Γ t} → Env Γ → WFT Γ t → Type
   ⌊ E , wf-s W ⌋-base = ⌊ E , W , false ⌋
   ⌊ _ , wf-b ⌋-base = Pure Bool
 
-  ⌊_,_,_⌋ : ∀{Γ S} → Env Γ → WFS Γ S → Bool → πType
+  ⌊_,_,_⌋ : ∀{Γ S} → Env Γ → WFS Γ S → Bool → Type
   ⌊ _ , wf-end , _ ⌋ = Chan #0 #0 (Pure ⊤)
   ⌊ E , wf-case x T S , b ⌋ with env-lookup E x
   ...| false , _  = ⌊ E , T , b ⌋

@@ -1,38 +1,55 @@
+{- This file is part of DLπ.                                         -}
+{-                                                                   -}
+{- DLπ is free software: you can redistribute it and/or modify it    -}
+{- under the terms of the GNU General Public License as published by -}
+{- the Free Software Foundation, either version 3 of the License, or -}
+{- (at your option) any later version.                               -}
+{-                                                                   -}
+{- DLπ is distributed in the hope that it will be useful, but        -}
+{- WITHOUT ANY WARRANTY; without even the implied warranty of        -}
+{- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU -}
+{- General Public License for more details.                          -}
+{-                                                                   -}
+{- You should have received a copy of the GNU General Public License -}
+{- along with DLπ.  If not, see <https://www.gnu.org/licenses/>.     -}
+{-                                                                   -}
+{- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
+
 open import Data.Bool
 open import Data.List as List
 open import Data.List.Relation.Unary.All
 open import Data.List.Relation.Unary.Any
 open import Data.Product
 open import Data.Nat
-open import Data.Fin
 open import Data.Unit
 
-module LDSTypes where
+module SessionTypes.LabelDependent.Types where
 
 {- ##### Types ##### -}
 
 mutual
-  Ctx : Set
-  Ctx = List Type
-
-  data Type : Set where
-    Session : SessionType → Type
-    Boolean : Type
+  data MessageType : Set where
+    Session : SessionType → MessageType
+    Boolean : MessageType
 
   data SessionType : Set where
     End : SessionType
     case_of_,_ : ℕ → SessionType → SessionType → SessionType
-    !_,_ ¿_,_ : Type → SessionType → SessionType
+    !_,_ ¿_,_ : MessageType → SessionType → SessionType
+
+Ctx : Set
+Ctx = List MessageType
 
 -- Interpretation
-⟦_⟧ : Type → Set
+
+⟦_⟧ : MessageType → Set
 ⟦ Session _ ⟧ = ⊤
 ⟦ Boolean ⟧ = Bool
 
 {- ##### Formation Rules ##### -}
 
 mutual
-  data WFV : ℕ → Ctx → Type → Set where
+  data WFV : ℕ → Ctx → MessageType → Set where
     here : ∀{Γ t} → WFV zero (t ∷ Γ) t
     next : ∀{Γ s t n} → WFV n Γ t → WFV (suc n) (s ∷ Γ) t
 
@@ -40,7 +57,7 @@ mutual
     empty : WFC []
     cons : ∀{Γ t} → WFT Γ t → WFC (t ∷ Γ)
 
-  data WFT : Ctx → Type → Set where
+  data WFT : Ctx → MessageType → Set where
     wf-s : ∀{Γ S} → WFS Γ S → WFT Γ (Session S)
     wf-b : ∀{Γ} → WFT Γ Boolean
 
@@ -73,7 +90,7 @@ env-lookup : ∀{Γ n} → (E : Env Γ) → (x : WFV n Γ Boolean) → Σ[ b ∈
 env-lookup (_ :: E) here = _ , here
 env-lookup (_ :: E) (next x) =
   let rec = (proj₂ (env-lookup E x)) in
-  _ , next rec 
+  _ , next rec
 
 data Bisimilar : ∀{Γ T S} -> Env Γ -> WFS Γ T -> WFS Γ S -> Set where
   sim-end    : ∀{Γ}{E : Env Γ} -> Bisimilar E wf-end wf-end

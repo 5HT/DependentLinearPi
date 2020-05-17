@@ -41,7 +41,7 @@ outline of the files and of their purpose:
   given channel can be rewritten in reducible normal form using
   structural pre-congruence. In this normal form, the two prefixes
   sit next to each other, so the process is ready to reduce.
-* [Scaling.agda](DLPi/Scaling.agda) Some auxiliary properties on
+* [Scaling.agda](DLPi/Scaling.agda) Some auxiliary properties about
   scaling.
 * [Semantics.agda](DLPi/Semantics.agda) The **operational
   semantics** of DLπ, including structural pre-congruence and
@@ -49,15 +49,40 @@ outline of the files and of their purpose:
   preserve typing.
 * [Substitution.agda](DLPi/Substitution.agda) **Substitution** of
   terms for variables in processes.
-* [Swapping.agda](DLPi/Swapping.agda) Some auxiliary properties on
-  swapping names in a context.
+* [Swapping.agda](DLPi/Swapping.agda) Some auxiliary properties
+  about swapping names in a context.
 * [Type.agda](DLPi/Type.agda) Definition of DLπ **types** and their
   properties, including `TNull`, `TScale` and `TSplit`.
 * [Weakening.agda](DLPi/Weakening.agda) Definition of `Weaken` and
-  weakening property for terms and processes.
+  weakening properties for terms and processes.
 
 ## Encodings
 
-This folder contains encoding functions from three representative
-session type languages, two of which use dependent types explicitly,
-to DLπ types. Decoding functions are also provided in all cases.
+This folder contains **encoding** functions from two dependent
+session type languages to DLπ types. The folder is organized as
+follows:
+
+* [Common.agda](SessionTypes/Common.agda) imports the extensionality
+  principles and defines a data type for **finite DLπ types**.
+* [LinearLogic](SessionTypes/LinearLogic) defines the encoding from
+  dependent session types *à la* Toninho, Caires &
+  Pfenning 2011. These session types subsume the original
+  non-dependent ones by Honda.
+* [LabelDependent](SessionTypes/LabelDependent) defines the encoding
+  from label-dependent session types defined by Thiemann &
+  Vasconcelos 2020.
+
+Each subfolder is organized as follows:
+
+* `Types.agda` defines **session types** and auxiliary data types,
+  including the notion of bisimilarity used for proving that
+  decoding is the inverse of encoding.
+* `Encoding.agda` defines a predicate on `Type` that characterizes
+  the image of the encoding.
+* `Encode.agda` defines the **encoding** function and proves that it
+  satisfies the `Encoding` predicate.
+* `Decode.agda` defines the **decoding** function.
+* `Proofs.agda` contains the proofs that encoding and decoding are
+  one the **inverse** of the other modulo bisimilarity.
+* `Equalities.agda`, when present, contains examples illustrating
+  the fact that the encoding function is **not injective**.
