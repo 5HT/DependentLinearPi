@@ -33,9 +33,9 @@ mutual
   ⌊_⌋ : SessionType → Type
   ⌊ End ⌋ = Chan #0 #0 (Pure ⊤)
   ⌊ In τ T ⌋ = Chan #1 #0 (Pair ⌊ τ ⌋-base λ _ → ⌊ T ⌋)
-  ⌊ Out τ T ⌋ = Chan #0 #1 (Pair ⌊ τ ⌋-base λ _ → dual-of ⌊ T ⌋)
+  ⌊ Out τ T ⌋ = Chan #0 #1 (Pair ⌊ τ ⌋-base λ _ → flip-chan ⌊ T ⌋)
   ⌊ Branch {n} f ⌋ = Chan #1 #0 (Pair (Pure (Fin n)) λ n → ⌊ f n ⌋)
-  ⌊ Choice {n} f ⌋ = Chan #0 #1 (Pair (Pure (Fin n)) λ n → dual-of ⌊ f n ⌋)
+  ⌊ Choice {n} f ⌋ = Chan #0 #1 (Pair (Pure (Fin n)) λ n → flip-chan ⌊ f n ⌋)
 
 mutual
   base-image : ∀ B → BaseEncoding ⌊ B ⌋-base

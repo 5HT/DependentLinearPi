@@ -43,6 +43,6 @@ mutual
   ⟦ Chan _ _ _ ⟧ = ⊤
   ⟦ Pair t f ⟧   = Σ ⟦ t ⟧ λ x -> ⟦ f x ⟧
 
-dual-of : Type → Type
-dual-of (Chan σ ρ t) = Chan ρ σ t
-dual-of t            = t
+flip-chan : Type → Type
+flip-chan (Chan σ ρ t) = Chan ρ σ t
+flip-chan t            = t

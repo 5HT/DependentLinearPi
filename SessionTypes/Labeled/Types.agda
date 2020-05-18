@@ -19,7 +19,6 @@ open import Data.Fin
 
 module SessionTypes.Labeled.Types where
 
-{- TYPE -}
 mutual
   data BaseType : Set₁ where
     Pure    : Set → BaseType
@@ -32,17 +31,9 @@ mutual
 
 {- ##### Duality ##### -}
 
--- data _∥ₛ_ : SessionType → SessionType → Set₁ where
---   ∅∥ₛ∅ : ∅ ∥ₛ ∅
---   ¿∥ₛ! : ∀{T S S'} → S ∥ₛ S' → (¿ T , S) ∥ₛ (! T , S')
---   !∥ₛ¿ : ∀{T S S'} → S ∥ₛ S' → (! T , S) ∥ₛ (¿ T , S')
---   &∥ₛ⊕ : ∀{n}{f f' : Fin n → SessionType} → (∀{i} → f i ∥ₛ f' i) → & f ∥ₛ ⊕ f'
---   ⊕∥ₛ& : ∀{n}{f f' : Fin n → SessionType} → (∀{i} → f i ∥ₛ f' i) → ⊕ f ∥ₛ & f'
-
-
--- ⊥ₛ : SessionType → SessionType
--- ⊥ₛ ∅ = ∅
--- ⊥ₛ (¿ x , s) = ! x , ⊥ₛ s
--- ⊥ₛ (! x , s) = ¿ x , ⊥ₛ s
--- ⊥ₛ (& x) = ⊕ λ x₁ → ⊥ₛ (x x₁)
--- ⊥ₛ (⊕ x) = & λ x₁ → ⊥ₛ (x x₁)
+dual : SessionType → SessionType
+dual End = End
+dual (In τ T) = Out τ (dual T)
+dual (Out τ T) = In τ (dual T)
+dual (Branch f) = Choice λ i → dual (f i)
+dual (Choice f) = Branch λ i → dual (f i)

@@ -59,82 +59,24 @@ mutual
   enc-dec (Branch fenc) = cong (λ x → Chan #1 #0 (Pair _ x)) (extensionality λ i → enc-dec (fenc i))
   enc-dec (Choice fenc) = cong (λ x → Chan #0 #1 (Pair _ x)) (extensionality λ i → enc-dec-dual (fenc i))
 
-  enc-dec-dual : ∀{t} → (enc : Encoding t) → t ≡ dual-of ⌊ ⌈ enc ⌉-dual ⌋
+  enc-dec-dual : ∀{t} → (enc : Encoding t) → t ≡ flip-chan ⌊ ⌈ enc ⌉-dual ⌋
   enc-dec-dual End = refl
   enc-dec-dual (In benc enc) = cong₂ (λ x y → Chan #1 #0 (Pair x (λ _ → y))) (enc-dec-base benc) (enc-dec-dual enc)
   enc-dec-dual (Out benc enc) = cong₂ (λ x y → Chan #0 #1 (Pair x (λ _ → y))) (enc-dec-base benc) (enc-dec enc)
   enc-dec-dual (Branch fenc) = cong (λ x → Chan #1 #0 (Pair _ x)) (extensionality λ i → enc-dec-dual (fenc i))
   enc-dec-dual (Choice fenc) = cong (λ x → Chan #0 #1 (Pair _ x)) (extensionality λ i → enc-dec (fenc i))
 
--- {- ##### Duality Correctness ##### -}
+flip-chan-inv : (t : Type) → flip-chan (flip-chan t) ≡ t
+flip-chan-inv (Pure _) = refl
+flip-chan-inv (Chan _ _ _) = refl
+flip-chan-inv (Pair _ _) = refl
 
--- dec-∥ₛ-eq : ∀{T}(E : πEncoding T) → (∀ b → ⌈ E , b ⌉ ∥ₛ ⌈ E , not b ⌉)
--- dec-∥ₛ-eq unit _ = ∅∥ₛ∅
--- dec-∥ₛ-eq (¿ch _ E) false = ¿∥ₛ! (dec-∥ₛ-eq E false) 
--- dec-∥ₛ-eq (!ch _ E) false = !∥ₛ¿ (dec-∥ₛ-eq E true)
--- dec-∥ₛ-eq (&ch f) false = &∥ₛ⊕ λ {i} → dec-∥ₛ-eq (f i) false
--- dec-∥ₛ-eq (⊕ch f) false = ⊕∥ₛ& λ {i} → dec-∥ₛ-eq (f i) true
--- dec-∥ₛ-eq (¿ch x E) true = !∥ₛ¿ (dec-∥ₛ-eq E true)
--- dec-∥ₛ-eq (!ch x E) true = ¿∥ₛ! (dec-∥ₛ-eq E false)
--- dec-∥ₛ-eq (&ch f) true = ⊕∥ₛ& λ {i} → dec-∥ₛ-eq (f i) true
--- dec-∥ₛ-eq (⊕ch f) true = &∥ₛ⊕ λ {i} → dec-∥ₛ-eq (f i) false
+flip-chan-swap : ∀{t s : Type} → t ≡ flip-chan s → flip-chan t ≡ s
+flip-chan-swap eq rewrite eq = flip-chan-inv _
 
--- enc-∥π-eq : ∀ S → (∀ b → ⌊ S , b ⌋ ∥π ⌊ S , not b ⌋)
--- enc-∥π-eq ∅ _ = flip
--- enc-∥π-eq (¿ _ , _) false = flip
--- enc-∥π-eq (! _ , _) false = flip
--- enc-∥π-eq (& _) false = flip
--- enc-∥π-eq (⊕ _) false = flip
--- enc-∥π-eq (¿ _ , _) true = flip
--- enc-∥π-eq (! _ , _) true = flip
--- enc-∥π-eq (& _) true = flip
--- enc-∥π-eq (⊕ _) true = flip
-
--- ∥ₛ-enc-eq : ∀{S S'} → S ∥ₛ S' → ∀ b → ⌊ S , b ⌋ ≡ ⌊ S' , not b ⌋
--- ∥ₛ-enc-eq ∅∥ₛ∅ _ = refl
--- ∥ₛ-enc-eq (¿∥ₛ! d) false = cong (λ x → Chan #1 #0 (Pair _ λ _ → x)) (∥ₛ-enc-eq d false)
--- ∥ₛ-enc-eq (!∥ₛ¿ d) false = cong (λ x → Chan #0 #1 (Pair _ λ _ → x)) (∥ₛ-enc-eq d true)
--- ∥ₛ-enc-eq (&∥ₛ⊕ {n} x) false = cong (λ x₁ → Chan #1 #0 (Pair (Pure (Fin n)) x₁)) (extensionality λ x₁ → ∥ₛ-enc-eq (x {x₁}) false)
--- ∥ₛ-enc-eq (⊕∥ₛ& {n} x) false = cong (λ x₁ → Chan #0 #1 (Pair (Pure (Fin n)) x₁)) (extensionality λ x₁ → ∥ₛ-enc-eq (x {x₁}) true)
--- ∥ₛ-enc-eq (¿∥ₛ! d) true = cong (λ x → Chan #0 #1 (Pair _ λ _ → x)) (∥ₛ-enc-eq d false)
--- ∥ₛ-enc-eq (!∥ₛ¿ d) true = cong (λ x → Chan #1 #0 (Pair _ λ _ → x)) (∥ₛ-enc-eq d true)
--- ∥ₛ-enc-eq (&∥ₛ⊕ {n} x) true = cong (λ x₁ → Chan #0 #1 (Pair (Pure (Fin n)) x₁)) (extensionality λ x₁ → ∥ₛ-enc-eq (x {x₁}) false)
--- ∥ₛ-enc-eq (⊕∥ₛ& {n} x) true = cong (λ x₁ → Chan #1 #0 (Pair (Pure (Fin n)) x₁)) (extensionality λ x₁ → ∥ₛ-enc-eq (x {x₁}) true)
-
-
--- dec-flip-eq : ∀{T}(E : πEncoding T) b → ⌈ E , b ⌉ ≡ ⌈ flip-π-enc E , not b ⌉
--- dec-flip-eq unit _ = refl
--- dec-flip-eq (¿ch x E) false = refl
--- dec-flip-eq (!ch x E) false = refl
--- dec-flip-eq (&ch e) false = refl
--- dec-flip-eq (⊕ch e) false = refl
--- dec-flip-eq (¿ch x E) true = refl
--- dec-flip-eq (!ch x E) true = refl
--- dec-flip-eq (&ch e) true = refl
--- dec-flip-eq (⊕ch e) true = refl
-
-
--- {- ##### Commuting Duality ##### -}
-
--- comm-dual-dec : ∀{T} (E : πEncoding T) b → ⌈ flip-π-enc E , b ⌉ ≡ ⊥ₛ ⌈ E , b ⌉
--- comm-dual-dec unit _ = refl
--- comm-dual-dec (¿ch x E) false =
---   let rec = comm-dual-dec E false in
---   cong₂ (λ x₁ x₂ → ! x₁ , x₂) refl (trans (dec-flip-eq E true) rec)
--- comm-dual-dec (!ch x E) false =
---   let rec = comm-dual-dec E true in
---   cong₂ (λ x₁ x₂ → ¿ x₁ , x₂) refl (trans (dec-flip-eq E false) rec)
--- comm-dual-dec (&ch e) false =
---   cong (λ x → ⊕ x) (extensionality λ x → trans (dec-flip-eq (e x) true) (comm-dual-dec (e x) false))
--- comm-dual-dec (⊕ch e) false =
---   cong (λ x → & x) (extensionality λ x → trans (dec-flip-eq (e x) false) (comm-dual-dec (e x) true))
--- comm-dual-dec (¿ch x E) true =
---   let rec = comm-dual-dec E true in
---   cong₂ (λ x₁ x₂ → ¿ x₁ , x₂) refl (trans (dec-flip-eq E false) rec)
--- comm-dual-dec (!ch x E) true =
---   let rec = comm-dual-dec E false in
---   cong₂ (λ x₁ x₂ → ! x₁ , x₂) refl (trans (dec-flip-eq E true) rec)
--- comm-dual-dec (&ch e) true =
---   cong (λ x → & x) (extensionality λ x → trans (dec-flip-eq (e x) false) (comm-dual-dec (e x) true))
--- comm-dual-dec (⊕ch e) true =
---   cong (λ x → ⊕ x) (extensionality λ x → trans (dec-flip-eq (e x) true) (comm-dual-dec (e x) false))
+duality : (T : SessionType) → ⌊ dual T ⌋ ≡ flip-chan ⌊ T ⌋
+duality End = refl
+duality (In τ T) = cong (λ x → Chan #0 #1 (Pair _ (λ _ → x))) (flip-chan-swap (duality T))
+duality (Out τ T) = cong (λ x → Chan #1 #0 (Pair _ (λ _ → x))) (duality T)
+duality (Branch f) = cong (Chan #0 #1) (cong (Pair _) (extensionality λ i → flip-chan-swap (duality (f i))))
+duality (Choice f) = cong (Chan #1 #0) (cong (Pair _) (extensionality λ i → duality (f i)))

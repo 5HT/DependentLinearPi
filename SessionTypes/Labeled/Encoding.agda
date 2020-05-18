@@ -39,7 +39,7 @@ mutual
     Choice : ∀{n} → {f : Fin n → Type} → ((i : Fin n) → Encoding (f i)) →
              Encoding (Chan #0 #1 (Pair (Pure (Fin n)) f))
 
-dual-enc : ∀{t} → Encoding t → Encoding (dual-of t)
+dual-enc : ∀{t} → Encoding t → Encoding (flip-chan t)
 dual-enc End = End
 dual-enc (In x e) = Out x e
 dual-enc (Out x e) = In x e
