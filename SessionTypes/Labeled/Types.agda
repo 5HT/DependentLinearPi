@@ -15,34 +15,34 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-import Level
-open import Axiom.Extensionality.Propositional using (Extensionality)
-open import Data.Unit using (⊤)
-open import Data.Product using (Σ)
+open import Data.Fin
 
-module SessionTypes.Common where
-
-postulate
-  extensionality : Extensionality Level.zero (Level.suc Level.zero)
-
-{- MULTIPLICITY -}
-
-data Multiplicity : Set where
-  #0 #1 #ω : Multiplicity
+module SessionTypes.Labeled.Types where
 
 {- TYPE -}
-
 mutual
-  data Type : Set₁ where
-    Pure : (A : Set) → Type
-    Chan : Multiplicity → Multiplicity → Type → Type
-    Pair : ∀(t : Type) → (f : ⟦ t ⟧ → Type) → Type
+  data BaseType : Set₁ where
+    Pure    : Set → BaseType
+    Session : SessionType → BaseType
 
-  ⟦_⟧ : Type → Set
-  ⟦ Pure A ⟧     = A
-  ⟦ Chan _ _ _ ⟧ = ⊤
-  ⟦ Pair t f ⟧   = Σ ⟦ t ⟧ λ x -> ⟦ f x ⟧
+  data SessionType : Set₁ where
+    End : SessionType
+    In Out : BaseType → SessionType → SessionType
+    Branch Choice : ∀{n} → (f : Fin n → SessionType) → SessionType
 
-dual-of : Type → Type
-dual-of (Chan σ ρ t) = Chan ρ σ t
-dual-of t            = t
+{- ##### Duality ##### -}
+
+-- data _∥ₛ_ : SessionType → SessionType → Set₁ where
+--   ∅∥ₛ∅ : ∅ ∥ₛ ∅
+--   ¿∥ₛ! : ∀{T S S'} → S ∥ₛ S' → (¿ T , S) ∥ₛ (! T , S')
+--   !∥ₛ¿ : ∀{T S S'} → S ∥ₛ S' → (! T , S) ∥ₛ (¿ T , S')
+--   &∥ₛ⊕ : ∀{n}{f f' : Fin n → SessionType} → (∀{i} → f i ∥ₛ f' i) → & f ∥ₛ ⊕ f'
+--   ⊕∥ₛ& : ∀{n}{f f' : Fin n → SessionType} → (∀{i} → f i ∥ₛ f' i) → ⊕ f ∥ₛ & f'
+
+
+-- ⊥ₛ : SessionType → SessionType
+-- ⊥ₛ ∅ = ∅
+-- ⊥ₛ (¿ x , s) = ! x , ⊥ₛ s
+-- ⊥ₛ (! x , s) = ¿ x , ⊥ₛ s
+-- ⊥ₛ (& x) = ⊕ λ x₁ → ⊥ₛ (x x₁)
+-- ⊥ₛ (⊕ x) = & λ x₁ → ⊥ₛ (x x₁)

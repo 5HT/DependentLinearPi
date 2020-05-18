@@ -15,34 +15,29 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-import Level
-open import Axiom.Extensionality.Propositional using (Extensionality)
-open import Data.Unit using (⊤)
-open import Data.Product using (Σ)
+open import Data.Fin
 
-module SessionTypes.Common where
+open import SessionTypes.Common
+open import SessionTypes.Labeled.Encoding
+open import SessionTypes.Labeled.Types
 
-postulate
-  extensionality : Extensionality Level.zero (Level.suc Level.zero)
-
-{- MULTIPLICITY -}
-
-data Multiplicity : Set where
-  #0 #1 #ω : Multiplicity
-
-{- TYPE -}
+module SessionTypes.Labeled.Decode where
 
 mutual
-  data Type : Set₁ where
-    Pure : (A : Set) → Type
-    Chan : Multiplicity → Multiplicity → Type → Type
-    Pair : ∀(t : Type) → (f : ⟦ t ⟧ → Type) → Type
+  ⌈_⌉-base : {t : Type} → BaseEncoding t → BaseType
+  ⌈ Pure {A} ⌉-base = Pure A
+  ⌈ Chan t ⌉-base = Session ⌈ t ⌉
 
-  ⟦_⟧ : Type → Set
-  ⟦ Pure A ⟧     = A
-  ⟦ Chan _ _ _ ⟧ = ⊤
-  ⟦ Pair t f ⟧   = Σ ⟦ t ⟧ λ x -> ⟦ f x ⟧
+  ⌈_⌉ : {t : Type} → Encoding t → SessionType
+  ⌈ End ⌉ = End
+  ⌈ In benc enc ⌉ = In ⌈ benc ⌉-base ⌈ enc ⌉
+  ⌈ Out benc enc ⌉ = Out ⌈ benc ⌉-base ⌈ enc ⌉-dual
+  ⌈ Branch f ⌉ = Branch λ i → ⌈ f i ⌉
+  ⌈ Choice f ⌉ = Choice λ i → ⌈ f i ⌉-dual
 
-dual-of : Type → Type
-dual-of (Chan σ ρ t) = Chan ρ σ t
-dual-of t            = t
+  ⌈_⌉-dual : {t : Type} → Encoding t → SessionType
+  ⌈ End ⌉-dual = End
+  ⌈ In benc enc ⌉-dual = Out ⌈ benc ⌉-base ⌈ enc ⌉-dual
+  ⌈ Out benc enc ⌉-dual = In ⌈ benc ⌉-base ⌈ enc ⌉
+  ⌈ Branch f ⌉-dual = Choice λ i → ⌈ f i ⌉-dual
+  ⌈ Choice f ⌉-dual = Branch λ i → ⌈ f i ⌉
