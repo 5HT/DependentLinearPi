@@ -40,22 +40,12 @@ mutual
 Ctx : Set
 Ctx = List MessageType
 
--- Interpretation
-
-⟦_⟧ : MessageType → Set
-⟦ Session _ ⟧ = ⊤
-⟦ Boolean ⟧ = Bool
-
 {- ##### Formation Rules ##### -}
 
 mutual
   data WFV : ℕ → Ctx → MessageType → Set where
     here : ∀{Γ t} → WFV zero (t ∷ Γ) t
     next : ∀{Γ s t n} → WFV n Γ t → WFV (suc n) (s ∷ Γ) t
-
-  data WFC : Ctx → Set where
-    empty : WFC []
-    cons : ∀{Γ t} → WFT Γ t → WFC (t ∷ Γ)
 
   data WFT : Ctx → MessageType → Set where
     wf-s : ∀{Γ S} → WFS Γ S → WFT Γ (Session S)

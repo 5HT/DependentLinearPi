@@ -25,34 +25,32 @@ open import SessionTypes.LabelDependent.Encoding
 
 module SessionTypes.LabelDependent.Decode where
 
-⌈_,_⌉ : ∀{t} -> Encoding t → Bool -> SessionType
-⌈ unit , _ ⌉ = End
-⌈ in-b f , false ⌉ = ¿ Boolean , case zero of ⌈ (f false) , false ⌉ , ⌈ (f true) , false ⌉
-⌈ in-b f , true ⌉ = ! Boolean , case zero of ⌈ (f false) , true ⌉ , ⌈ (f true) , true ⌉
-⌈ out-b f , false ⌉ = ! Boolean , case zero of ⌈ (f false) , true ⌉ , ⌈ (f true) , true ⌉
-⌈ out-b f , true ⌉ = ¿ Boolean , case zero of ⌈ (f false) , false ⌉ , ⌈ (f true) , false ⌉
-⌈ in-s enc1 enc2 , false ⌉ = ¿ Session ⌈ enc1 , false ⌉ , ⌈ enc2 , false ⌉
-⌈ in-s enc1 enc2 , true ⌉ = ! Session ⌈ enc1 , false ⌉ , ⌈ enc2 , true ⌉
-⌈ out-s enc1 enc2 , false ⌉ = ! Session ⌈ enc1 , false ⌉ , ⌈ enc2 , true ⌉
-⌈ out-s enc1 enc2 , true ⌉ = ¿ Session ⌈ enc1 , false ⌉ , ⌈ enc2 , false ⌉
+mutual
+  ⌈_⌉ : ∀{t} → Encoding t → SessionType
+  ⌈ unit ⌉ = End
+  ⌈ in-b f ⌉ = ¿ Boolean , case zero of ⌈ f false ⌉ , ⌈ f true ⌉
+  ⌈ out-b f ⌉ = ! Boolean , case zero of ⌈ f false ⌉-dual , ⌈ f true ⌉-dual
+  ⌈ in-s enc1 enc2 ⌉ = ¿ Session ⌈ enc1 ⌉ , ⌈ enc2 ⌉
+  ⌈ out-s enc1 enc2 ⌉ = ! Session ⌈ enc1 ⌉ , ⌈ enc2 ⌉-dual
 
-x⌈_⌉ : ∀{t} → Encoding t → SessionType
-x⌈ unit ⌉ = End
-x⌈ in-b f ⌉ = ¿ Boolean , case zero of x⌈ f false ⌉ , x⌈ f true ⌉
-x⌈ out-b f ⌉ = ! Boolean , case zero of x⌈ f false ⌉ , x⌈ f true ⌉
-x⌈ in-s enc1 enc2 ⌉ = ¿ Session x⌈ enc1 ⌉ , x⌈ enc2 ⌉
-x⌈ out-s enc1 enc2 ⌉ = ! Session x⌈ enc1 ⌉ , x⌈ enc2 ⌉
+  ⌈_⌉-dual : ∀{t} → Encoding t → SessionType
+  ⌈ unit ⌉-dual = End
+  ⌈ in-b f ⌉-dual = ! Boolean , case zero of ⌈ f false ⌉-dual , ⌈ f true ⌉-dual
+  ⌈ out-b f ⌉-dual = ¿ Boolean , case zero of ⌈ f false ⌉ , ⌈ f true ⌉
+  ⌈ in-s enc1 enc2 ⌉-dual = ! Session ⌈ enc1 ⌉ , ⌈ enc2 ⌉-dual
+  ⌈ out-s enc1 enc2 ⌉-dual = ¿ Session ⌈ enc1 ⌉ , ⌈ enc2 ⌉
 
-dec-WFS-Γ : ∀{t Γ} b -> (enc : Encoding t) -> WFS Γ ⌈ enc , b ⌉
-dec-WFS-Γ _ unit = wf-end
-dec-WFS-Γ false (in-b x) = wf-in-b (wf-case here  (dec-WFS-Γ false (x false)) (dec-WFS-Γ false (x true)))
-dec-WFS-Γ true (in-b x) = wf-out-b (wf-case here  (dec-WFS-Γ true (x false)) (dec-WFS-Γ true (x true)))
-dec-WFS-Γ false (out-b x) = wf-out-b (wf-case here  (dec-WFS-Γ true (x false)) (dec-WFS-Γ true (x true)))
-dec-WFS-Γ true (out-b x) = wf-in-b (wf-case here  (dec-WFS-Γ false (x false)) (dec-WFS-Γ false (x true)))
-dec-WFS-Γ false (in-s T₁ T₂) = wf-in-s (dec-WFS-Γ false T₁) (dec-WFS-Γ false T₂)
-dec-WFS-Γ true (in-s T₁ T₂) = wf-out-s (dec-WFS-Γ false T₁) (dec-WFS-Γ true T₂) 
-dec-WFS-Γ false (out-s T₁ T₂) = wf-out-s (dec-WFS-Γ false T₁) (dec-WFS-Γ true T₂) 
-dec-WFS-Γ true (out-s T₁ T₂) = wf-in-s (dec-WFS-Γ false T₁) (dec-WFS-Γ false T₂) 
+mutual
+  dec-WFS : ∀{t Γ} -> (enc : Encoding t) -> WFS Γ ⌈ enc ⌉
+  dec-WFS unit = wf-end
+  dec-WFS (in-b x) = wf-in-b (wf-case here (dec-WFS (x false)) (dec-WFS (x true)))
+  dec-WFS (out-b x) = wf-out-b (wf-case here (dec-WFS-dual (x false)) (dec-WFS-dual (x true)))
+  dec-WFS (in-s T₁ T₂) = wf-in-s (dec-WFS T₁) (dec-WFS T₂)
+  dec-WFS (out-s T₁ T₂) = wf-out-s (dec-WFS T₁) (dec-WFS-dual T₂)
 
-dec-WFS-[] : ∀{t} b -> (enc : Encoding t) -> WFS [] ⌈ enc , b ⌉
-dec-WFS-[] b enc = dec-WFS-Γ {Γ = []} b enc
+  dec-WFS-dual : ∀{t Γ} -> (enc : Encoding t) -> WFS Γ ⌈ enc ⌉-dual
+  dec-WFS-dual unit = wf-end
+  dec-WFS-dual (in-b x) = wf-out-b (wf-case here  (dec-WFS-dual (x false)) (dec-WFS-dual (x true)))
+  dec-WFS-dual (out-b x) = wf-in-b (wf-case here  (dec-WFS (x false)) (dec-WFS (x true)))
+  dec-WFS-dual (in-s T₁ T₂) = wf-out-s (dec-WFS T₁) (dec-WFS-dual T₂)
+  dec-WFS-dual (out-s T₁ T₂) = wf-in-s (dec-WFS T₁) (dec-WFS T₂)

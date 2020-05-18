@@ -23,8 +23,6 @@ open import SessionTypes.Common
 
 module SessionTypes.LabelDependent.Encoding where
 
-{- ##### πEncoding ##### -}
-
 data Encoding : Type → Set₁ where
   unit  : Encoding (Chan #0 #0 (Pure ⊤))
   in-b  : {f : Bool → Type} → ((b : Bool) → Encoding (f b)) → Encoding (Chan #1 #0 (Pair (Pure Bool) f))
