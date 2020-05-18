@@ -36,6 +36,13 @@ module SessionTypes.LabelDependent.Decode where
 ⌈ out-s enc1 enc2 , false ⌉ = ! Session ⌈ enc1 , false ⌉ , ⌈ enc2 , true ⌉
 ⌈ out-s enc1 enc2 , true ⌉ = ¿ Session ⌈ enc1 , false ⌉ , ⌈ enc2 , false ⌉
 
+x⌈_⌉ : ∀{t} → Encoding t → SessionType
+x⌈ unit ⌉ = End
+x⌈ in-b f ⌉ = ¿ Boolean , case zero of x⌈ f false ⌉ , x⌈ f true ⌉
+x⌈ out-b f ⌉ = ! Boolean , case zero of x⌈ f false ⌉ , x⌈ f true ⌉
+x⌈ in-s enc1 enc2 ⌉ = ¿ Session x⌈ enc1 ⌉ , x⌈ enc2 ⌉
+x⌈ out-s enc1 enc2 ⌉ = ! Session x⌈ enc1 ⌉ , x⌈ enc2 ⌉
+
 dec-WFS-Γ : ∀{t Γ} b -> (enc : Encoding t) -> WFS Γ ⌈ enc , b ⌉
 dec-WFS-Γ _ unit = wf-end
 dec-WFS-Γ false (in-b x) = wf-in-b (wf-case here  (dec-WFS-Γ false (x false)) (dec-WFS-Γ false (x true)))

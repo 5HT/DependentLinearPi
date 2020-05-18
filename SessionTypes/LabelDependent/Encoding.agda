@@ -31,3 +31,10 @@ data Encoding : Type → Set₁ where
   out-b : {f : Bool → Type} → ((b : Bool) → Encoding (f b)) → Encoding (Chan #0 #1 (Pair (Pure Bool) f))
   in-s  : {t t' : Type} → Encoding t → Encoding t' → Encoding (Chan #1 #0 (Pair t λ _ → t'))
   out-s : {t t' : Type} → Encoding t → Encoding t' → Encoding (Chan #0 #1 (Pair t λ _ → t'))
+
+dual-enc : ∀{t : Type} → Encoding t → Encoding (flip-chan t)
+dual-enc unit = unit
+dual-enc (in-b enc) = out-b enc
+dual-enc (out-b enc) = in-b enc
+dual-enc (in-s enc1 enc2) = out-s enc1 enc2
+dual-enc (out-s enc1 enc2) = in-s enc1 enc2

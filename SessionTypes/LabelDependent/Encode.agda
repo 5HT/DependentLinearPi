@@ -45,6 +45,25 @@ mutual
   ⌊ E , wf-out-s T S , true ⌋  = Chan #1 #0 (Pair ⌊ E , T , false ⌋ λ _ -> ⌊ E , S , true ⌋)
   ⌊ E , wf-out-b T   , true ⌋  = Chan #1 #0 (Pair (Pure Bool) λ x -> ⌊ x :: E , T , true ⌋)
 
+  x⌊_,_⌋ : ∀{Γ T} → Env Γ → WFS Γ T → Type
+  x⌊ _ , wf-end ⌋ = Chan #0 #0 (Pure ⊤)
+  x⌊ E , wf-case x T S ⌋ with env-lookup E x
+  ... | false , _ = x⌊ E , T ⌋
+  ... | true , _  = x⌊ E , S ⌋
+  x⌊ E , wf-in-s S T ⌋ = Chan #1 #0 (Pair x⌊ E , S ⌋ λ _ → x⌊ E , T ⌋)
+  x⌊ E , wf-out-s S T ⌋ = Chan #0 #1 (Pair x⌊ E , S ⌋ λ _ → flip-chan x⌊ E , T ⌋)
+  x⌊ E , wf-in-b T ⌋ = Chan #1 #0 (Pair (Pure Bool) λ x → x⌊ x :: E , T ⌋)
+  x⌊ E , wf-out-b T ⌋ = Chan #0 #1 (Pair (Pure Bool) λ x → flip-chan x⌊ x :: E , T ⌋)
+
+image : ∀{Γ T} → (E : Env Γ) → (W : WFS Γ T) → Encoding x⌊ E , W ⌋
+image E wf-end = unit
+image E (wf-case x W1 W2) with env-lookup E x
+... | false , _ = image E W1
+... | true , _  = image E W2
+image E (wf-in-s W1 W2) = in-s (image E W1) (image E W2)
+image E (wf-out-s W1 W2) = out-s (image E W1) (dual-enc (image E W2))
+image E (wf-in-b W) = in-b λ x → image (x :: E) W
+image E (wf-out-b W) = out-b λ x → dual-enc (image (x :: E) W)
 
 enc-Enc : ∀{Γ T} -> (E : Env Γ) -> (W : WFS Γ T) -> (b : Bool) -> Encoding ⌊ E , W , b ⌋
 enc-Enc E wf-end b = unit

@@ -27,6 +27,66 @@ open import SessionTypes.LabelDependent.Encoding
 
 module SessionTypes.LabelDependent.Proofs where
 
+mutual
+  xenc-dec : ∀{Γ T} → (E : Env Γ) → (W : WFS Γ T) → Bisimilar E W (dec-WFS-Γ false (image E W))
+  xenc-dec E wf-end = sim-end
+  xenc-dec E (wf-case x W1 W2) with env-lookup E x
+  ... | false , p = sim-case-lf p (xenc-dec E W1)
+  ... | true  , p = sim-case-lt p (xenc-dec E W2)
+  xenc-dec E (wf-in-s W1 W2) = sim-in-s (xenc-dec E W1) (xenc-dec E W2)
+  xenc-dec E (wf-out-s W1 W2) = sim-out-s (xenc-dec E W1) (xenc-dec-dual E W2)
+  xenc-dec E (wf-in-b W) = sim-in-b (sim-case-rf here (xenc-dec (false :: E) W))
+                                    (sim-case-rt here (xenc-dec (true :: E) W))
+  xenc-dec E (wf-out-b W) = sim-out-b (sim-case-rf here (xenc-dec-dual (false :: E) W))
+                                      (sim-case-rt here (xenc-dec-dual (true :: E) W))
+
+  xenc-dec-dual : ∀{Γ T} → (E : Env Γ) → (W : WFS Γ T) → Bisimilar E W (dec-WFS-Γ true (dual-enc (image E W)))
+  xenc-dec-dual E wf-end = sim-end
+  xenc-dec-dual E (wf-case x W1 W2) with env-lookup E x
+  ... | false , p = sim-case-lf p (xenc-dec-dual E W1)
+  ... | true  , p = sim-case-lt p (xenc-dec-dual E W2)
+  xenc-dec-dual E (wf-in-s W1 W2) = sim-in-s (xenc-dec E W1) (xenc-dec E W2)
+  xenc-dec-dual E (wf-out-s W1 W2) = sim-out-s (xenc-dec E W1) (xenc-dec-dual E W2)
+  xenc-dec-dual E (wf-in-b W) = sim-in-b (sim-case-rf here (xenc-dec (false :: E) W))
+                                         (sim-case-rt here (xenc-dec (true :: E) W))
+  xenc-dec-dual E (wf-out-b W) = sim-out-b (sim-case-rf here (xenc-dec-dual (false :: E) W))
+                                           (sim-case-rt here (xenc-dec-dual (true :: E) W))
+
+mutual
+  xdec-enc : ∀{Γ t} → (E : Env Γ) → (enc : Encoding t) → t ≡ x⌊ E , dec-WFS-Γ false enc ⌋
+  xdec-enc E unit = refl
+  xdec-enc E (in-b f) =
+    cong (Chan #1 #0)
+    (cong (Pair (Pure Bool))
+          (extensionality λ { true  → xdec-enc (true :: E) (f true)
+                            ; false → xdec-enc (false :: E) (f false) }))
+  xdec-enc E (out-b f) =
+    cong (Chan #0 #1)
+    (cong (Pair (Pure Bool))
+          (extensionality λ { true  → xdec-enc-dual (true :: E) (f true)
+                            ; false → xdec-enc-dual (false :: E) (f false) }))
+  xdec-enc E (in-s enc1 enc2) =
+    cong (Chan #1 #0) (cong₂ (λ x y → Pair x (λ _ → y)) (xdec-enc E enc1) (xdec-enc E enc2))
+  xdec-enc E (out-s enc1 enc2) =
+    cong (Chan #0 #1) (cong₂ (λ x y → Pair x (λ _ → y)) (xdec-enc E enc1) (xdec-enc-dual E enc2))
+
+  xdec-enc-dual : ∀{Γ t} → (E : Env Γ) → (enc : Encoding t) → t ≡ flip-chan x⌊ E , dec-WFS-Γ true enc ⌋
+  xdec-enc-dual E unit = refl
+  xdec-enc-dual E (in-b f) =
+    cong (Chan #1 #0)
+    (cong (Pair (Pure Bool))
+          (extensionality λ { true  → xdec-enc-dual (true :: E) (f true) ;
+                              false → xdec-enc-dual (false :: E) (f false) }))
+  xdec-enc-dual E (out-b f) =
+    cong (Chan #0 #1)
+    (cong (Pair (Pure Bool))
+          (extensionality λ { true  → xdec-enc (true :: E) (f true)
+                            ; false → xdec-enc (false :: E) (f false) }))
+  xdec-enc-dual E (in-s enc1 enc2) =
+    cong (Chan #1 #0) (cong₂ (λ x y → Pair x (λ _ → y)) (xdec-enc E enc1) (xdec-enc-dual E enc2))
+  xdec-enc-dual E (out-s enc1 enc2) =
+    cong (Chan #0 #1) (cong₂ (λ x y → Pair x (λ _ → y)) (xdec-enc E enc1) (xdec-enc E enc2))
+
 enc-dec : ∀{Γ S} b → (E : Env Γ) → (W : WFS Γ S) -> Bisimilar E W (dec-WFS-Γ b (enc-Enc E W b))
 enc-dec _ _ wf-end = sim-end
 enc-dec false E (wf-case x W W₁) with env-lookup E x
