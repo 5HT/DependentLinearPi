@@ -66,7 +66,7 @@ type languages to DLπ types. The folder is organized as follows:
   **finite DLπ types**.
 * [FinLabels](SessionTypes/FinLabels) contains the encoding of
   non-dependent, labeled session types with n-ary branches and
-  choices. Labels are elements of `Fin n` data type.
+  choices. Labels are elements of the `Fin n` data type.
 * [LinearLogic](SessionTypes/LinearLogic) contains the encoding of
   dependent session types *à la* [Toninho, Caires & Pfenning
   2011](https://doi.org/10.1145/2003476.2003499). These session
