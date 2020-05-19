@@ -21,12 +21,12 @@ open import Data.Bool
 open import Data.Unit
 
 open import SessionTypes.Common
-open import SessionTypes.Labeled.Types
-open import SessionTypes.Labeled.Encode
-open import SessionTypes.Labeled.Decode
-open import SessionTypes.Labeled.Encoding
+open import SessionTypes.FinLabels.Types
+open import SessionTypes.FinLabels.Encode
+open import SessionTypes.FinLabels.Decode
+open import SessionTypes.FinLabels.Encoding
 
-module Sessiontypes.Labeled.Proofs where
+module Sessiontypes.FinLabels.Proofs where
 
 mutual
   dec-enc-base : (τ : BaseType) → τ ≡ ⌈ base-image τ ⌉-base

@@ -21,7 +21,7 @@ open import Relation.Binary.PropositionalEquality
 
 open import SessionTypes.Common
 
-module SessionTypes.Labeled.Encoding where
+module SessionTypes.FinLabels.Encoding where
 
 {- ##### πEncoding ##### -}
 

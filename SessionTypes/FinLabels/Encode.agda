@@ -20,10 +20,10 @@ open import Data.Unit
 open import Relation.Binary.PropositionalEquality
 
 open import SessionTypes.Common
-open import SessionTypes.Labeled.Types
-open import SessionTypes.Labeled.Encoding
+open import SessionTypes.FinLabels.Types
+open import SessionTypes.FinLabels.Encoding
 
-module SessionTypes.Labeled.Encode where
+module SessionTypes.FinLabels.Encode where
 
 mutual
   ⌊_⌋-base : BaseType → Type

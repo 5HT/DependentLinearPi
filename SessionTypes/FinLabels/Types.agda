@@ -17,7 +17,7 @@
 
 open import Data.Fin
 
-module SessionTypes.Labeled.Types where
+module SessionTypes.FinLabels.Types where
 
 mutual
   data BaseType : Set₁ where

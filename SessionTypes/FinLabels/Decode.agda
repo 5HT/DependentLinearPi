@@ -18,10 +18,10 @@
 open import Data.Fin
 
 open import SessionTypes.Common
-open import SessionTypes.Labeled.Encoding
-open import SessionTypes.Labeled.Types
+open import SessionTypes.FinLabels.Encoding
+open import SessionTypes.FinLabels.Types
 
-module SessionTypes.Labeled.Decode where
+module SessionTypes.FinLabels.Decode where
 
 mutual
   ⌈_⌉-base : {t : Type} → BaseEncoding t → BaseType

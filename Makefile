@@ -1,5 +1,5 @@
 
-ENCODINGS = Labeled LinearLogic LabelDependent
+ENCODINGS = FinLabels LinearLogic LabelDependent
 
 all: $(ENCODINGS:%=SessionTypes/%/Proofs.agdai)
 
