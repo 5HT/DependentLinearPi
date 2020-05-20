@@ -31,8 +31,8 @@ mutual
   enc-dec : ∀{Γ T} → (E : Env Γ) → (W : WFS Γ T) → Bisimilar E W (dec-WFS (image E W))
   enc-dec E wf-end = sim-end
   enc-dec E (wf-case x W1 W2) with env-lookup E x
-  ... | false , p = sim-case-lf p (enc-dec E W1)
-  ... | true  , p = sim-case-lt p (enc-dec E W2)
+  ... | true  , p = sim-case-lt p (enc-dec E W1)
+  ... | false , p = sim-case-lf p (enc-dec E W2)
   enc-dec E (wf-in-s W1 W2) = sim-in-s (enc-dec E W1) (enc-dec E W2)
   enc-dec E (wf-out-s W1 W2) = sim-out-s (enc-dec E W1) (enc-dec-dual E W2)
   enc-dec E (wf-in-b W) = sim-in-b (sim-case-rf here (enc-dec (false :: E) W))
@@ -43,8 +43,8 @@ mutual
   enc-dec-dual : ∀{Γ T} → (E : Env Γ) → (W : WFS Γ T) → Bisimilar E W (dec-WFS-dual (dual-enc (image E W)))
   enc-dec-dual E wf-end = sim-end
   enc-dec-dual E (wf-case x W1 W2) with env-lookup E x
-  ... | false , p = sim-case-lf p (enc-dec-dual E W1)
-  ... | true  , p = sim-case-lt p (enc-dec-dual E W2)
+  ... | true  , p = sim-case-lt p (enc-dec-dual E W1)
+  ... | false , p = sim-case-lf p (enc-dec-dual E W2)
   enc-dec-dual E (wf-in-s W1 W2) = sim-in-s (enc-dec E W1) (enc-dec E W2)
   enc-dec-dual E (wf-out-s W1 W2) = sim-out-s (enc-dec E W1) (enc-dec-dual E W2)
   enc-dec-dual E (wf-in-b W) = sim-in-b (sim-case-rf here (enc-dec (false :: E) W))

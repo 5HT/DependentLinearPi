@@ -29,8 +29,8 @@ module SessionTypes.LabelDependent.Encode where
 ⌊_,_⌋ : ∀{Γ T} → Env Γ → WFS Γ T → Type
 ⌊ _ , wf-end ⌋ = Chan #0 #0 (Pure ⊤)
 ⌊ E , wf-case x T S ⌋ with env-lookup E x
-... | false , _ = ⌊ E , T ⌋
-... | true , _  = ⌊ E , S ⌋
+... | true  , _ = ⌊ E , T ⌋
+... | false , _ = ⌊ E , S ⌋
 ⌊ E , wf-in-s S T ⌋ = Chan #1 #0 (Pair ⌊ E , S ⌋ λ _ → ⌊ E , T ⌋)
 ⌊ E , wf-out-s S T ⌋ = Chan #0 #1 (Pair ⌊ E , S ⌋ λ _ → flip-chan ⌊ E , T ⌋)
 ⌊ E , wf-in-b T ⌋ = Chan #1 #0 (Pair (Pure Bool) λ x → ⌊ x :: E , T ⌋)
@@ -39,8 +39,8 @@ module SessionTypes.LabelDependent.Encode where
 image : ∀{Γ T} → (E : Env Γ) → (W : WFS Γ T) → Encoding ⌊ E , W ⌋
 image E wf-end = unit
 image E (wf-case x W1 W2) with env-lookup E x
-... | false , _ = image E W1
-... | true , _  = image E W2
+... | true  , _ = image E W1
+... | false , _ = image E W2
 image E (wf-in-s W1 W2) = in-s (image E W1) (image E W2)
 image E (wf-out-s W1 W2) = out-s (image E W1) (dual-enc (image E W2))
 image E (wf-in-b W) = in-b λ x → image (x :: E) W

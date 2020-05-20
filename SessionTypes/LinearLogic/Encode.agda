@@ -34,26 +34,26 @@ mutual
   ⌊ A ⊸ B , true ⌋ =  Chan #0 #1 (Pair ⌊ A , false ⌋ λ _ → ⌊ B , false ⌋)
   ⌊ A ⊗ B , false ⌋ = Chan #0 #1 (Pair ⌊ A , false ⌋ λ _ → ⌊ B , true ⌋)
   ⌊ A ⊗ B , true ⌋ = Chan #1 #0 (Pair ⌊ A , false ⌋ λ _ → ⌊ B , true ⌋)
-  ⌊ A & B , false ⌋ = Chan #1 #0 (Pair (Pure Bool) λ {true → ⌊ B , false ⌋ ; false → ⌊ A , false ⌋})
-  ⌊ A & B , true ⌋ = Chan #0 #1 (Pair (Pure Bool) λ {true → ⌊ B , false ⌋ ; false → ⌊ A , false ⌋})
-  ⌊ A ⊕ B , false ⌋ = Chan #0 #1 (Pair (Pure Bool) λ {true → ⌊ B , true ⌋ ; false → ⌊ A , true ⌋})
-  ⌊ A ⊕ B , true ⌋ = Chan #1 #0 (Pair (Pure Bool) λ {true → ⌊ B , true ⌋ ; false → ⌊ A , true ⌋})
+  ⌊ A & B , false ⌋ = Chan #1 #0 (Pair (Pure Bool) λ x → if x then ⌊ A , false ⌋ else ⌊ B , false ⌋)
+  ⌊ A & B , true ⌋ = Chan #0 #1 (Pair (Pure Bool) λ x → if x then ⌊ A , false ⌋ else ⌊ B , false ⌋)
+  ⌊ A ⊕ B , false ⌋ = Chan #0 #1 (Pair (Pure Bool) λ x → if x then ⌊ A , true ⌋ else ⌊ B , true ⌋)
+  ⌊ A ⊕ B , true ⌋ = Chan #1 #0 (Pair (Pure Bool) λ x → if x then ⌊ A , true ⌋ else ⌊ B , true ⌋)
   ⌊ Ex τ # f , false ⌋ = Chan #0 #1 (Pair (Pure τ) λ x → ⌊ f x , true ⌋)
   ⌊ Ex τ # f , true ⌋ = Chan #1 #0 (Pair (Pure τ) λ x → ⌊ f x , true ⌋)
   ⌊ All τ # f , false ⌋ = Chan #1 #0 (Pair (Pure τ) λ x → ⌊ f x , false ⌋)
   ⌊ All τ # f , true ⌋ = Chan #0 #1 (Pair (Pure τ) λ x → ⌊ f x , false ⌋)
 
-enc-Enc : ∀ S b → Encoding ⌊ S , b ⌋
+enc-Enc : ∀ A b → Encoding ⌊ A , b ⌋
 enc-Enc End _ = unit
 enc-Enc ($ x) _ = pure x
-enc-Enc (S ⊸ S₁) false = input (enc-Enc S false) λ _ → enc-Enc S₁ false
-enc-Enc (S ⊸ S₁) true = output (enc-Enc S false) λ _ → enc-Enc S₁ false
-enc-Enc (S ⊗ S₁) false = output (enc-Enc S false) λ _ → enc-Enc S₁ true
-enc-Enc (S ⊗ S₁) true = input (enc-Enc S false) λ _ → enc-Enc S₁ true
-enc-Enc (S & S₁) false = input (pure Bool) λ {false → enc-Enc S false ; true → enc-Enc S₁ false}
-enc-Enc (S & S₁) true = output (pure Bool) λ {false → enc-Enc S false ; true → enc-Enc S₁ false}
-enc-Enc (S ⊕ S₁) false = output (pure Bool) λ {false → enc-Enc S true ; true → enc-Enc S₁ true}
-enc-Enc (S ⊕ S₁) true = input (pure Bool) λ {false → enc-Enc S true ; true → enc-Enc S₁ true}
+enc-Enc (A ⊸ B) false = input (enc-Enc A false) λ _ → enc-Enc B false
+enc-Enc (A ⊸ B) true = output (enc-Enc A false) λ _ → enc-Enc B false
+enc-Enc (A ⊗ B) false = output (enc-Enc A false) λ _ → enc-Enc B true
+enc-Enc (A ⊗ B) true = input (enc-Enc A false) λ _ → enc-Enc B true
+enc-Enc (A & B) false = input (pure Bool) λ { true → enc-Enc A false ; false → enc-Enc B false }
+enc-Enc (A & B) true = output (pure Bool) λ { true → enc-Enc A false ; false → enc-Enc B false } 
+enc-Enc (A ⊕ B) false = output (pure Bool) λ { true → enc-Enc A true ; false → enc-Enc B true}
+enc-Enc (A ⊕ B) true = input (pure Bool) λ { true → enc-Enc A true ; false → enc-Enc B true}
 enc-Enc (Ex τ # x) false = output (pure τ) λ x₁ → enc-Enc (x x₁) true
 enc-Enc (Ex τ # x) true = input (pure τ) λ x₁ → enc-Enc (x x₁) true
 enc-Enc (All τ # x) false = input (pure τ) λ x₁ → enc-Enc (x x₁) false

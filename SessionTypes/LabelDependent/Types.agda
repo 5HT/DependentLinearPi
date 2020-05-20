@@ -87,22 +87,22 @@ data Bisimilar : ∀{Γ T S} -> Env Γ -> WFS Γ T -> WFS Γ S -> Set where
   sim-case-lf :
     ∀{Γ T1 T2 T n}{E : Env Γ}{W1 : WFS Γ T1}{W2 : WFS Γ T2}{W : WFS Γ T}{V : WFV n Γ Boolean} ->
     VarIs E V false ->
-    Bisimilar E W1 W ->
+    Bisimilar E W2 W ->
     Bisimilar E (wf-case V W1 W2) W
   sim-case-lt :
     ∀{Γ T1 T2 T n}{E : Env Γ}{W1 : WFS Γ T1}{W2 : WFS Γ T2}{W : WFS Γ T}{V : WFV n Γ Boolean} ->
     VarIs E V true ->
-    Bisimilar E W2 W ->
+    Bisimilar E W1 W ->
     Bisimilar E (wf-case V W1 W2) W
   sim-case-rf :
     ∀{Γ T1 T2 T n}{E : Env Γ}{W1 : WFS Γ T1}{W2 : WFS Γ T2}{W : WFS Γ T}{V : WFV n Γ Boolean} ->
     VarIs E V false ->
-    Bisimilar E W W1 ->
+    Bisimilar E W W2 ->
     Bisimilar E W (wf-case V W1 W2)
   sim-case-rt :
     ∀{Γ T1 T2 T n}{E : Env Γ}{W1 : WFS Γ T1}{W2 : WFS Γ T2}{W : WFS Γ T}{V : WFV n Γ Boolean} ->
     VarIs E V true ->
-    Bisimilar E W W2 ->
+    Bisimilar E W W1 ->
     Bisimilar E W (wf-case V W1 W2)
   sim-in-s :
     ∀{Γ T1 T2 S1 S2}{E : Env Γ}{W1 : WFS Γ T1}{W1' : WFS Γ S1}{W2 : WFS Γ T2}{W2' : WFS Γ S2} ->
