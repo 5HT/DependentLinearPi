@@ -117,6 +117,3 @@ c-split-split-split sp sp1 sp2 =
   let _ , sp , sp1 = csplit-assoc-rl sp1 sp in
   _ , _ , sp , sp1 , sp2
 
-c-split-scale : ∀{Γ Δ} -> CSplit Δ Γ Γ -> CSplit Δ Γ Δ
-c-split-scale [] = []
-c-split-scale (ts :: sp) = {!!} :: (c-split-scale sp)
