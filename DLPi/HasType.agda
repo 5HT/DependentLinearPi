@@ -39,25 +39,25 @@ has-type-split :
   -> Lookup k Γ t v
   -> CSplit Γ Γ1 Γ2
   -> ∃[ t1 ] ∃[ t2 ] ∃[ v1 ] ∃[ v2 ] (TSplit t t1 t2 v v1 v2 × Lookup k Γ1 t1 v1 × Lookup k Γ2 t2 v2)
-has-type-split ht-here (ts :: _) =
-  _ , _ , _ , _ , ts , ht-here , ht-here
-has-type-split (ht-next ht) (_ :: sp) =
+has-type-split here (ts :: _) =
+  _ , _ , _ , _ , ts , here , here
+has-type-split (next ht) (_ :: sp) =
   let _ , _ , _ , _ , ts , ht1 , ht2 = has-type-split ht sp in
-  _ , _ , _ , _ , ts , ht-next ht1 , ht-next ht2
+  _ , _ , _ , _ , ts , next ht1 , next ht2
 
 has-type-null : ∀{Γ k t v} -> Lookup k Γ t v -> CNull Γ -> TNull t
-has-type-null ht-here (tnull :: _) = tnull
-has-type-null (ht-next ht) (_ :: null) = has-type-null ht null
+has-type-null here (tnull :: _) = tnull
+has-type-null (next ht) (_ :: null) = has-type-null ht null
 
 has-type-scale :
   ∀{Γ Δ k t v} ->
   Lookup k Δ t v ->
   CScale Γ Δ ->
   ∃[ s ] ∃[ w ] (TScale s t w v × Lookup k Γ s w)
-has-type-scale ht-here (tsc :: sc) = _ , _ , tsc , ht-here
-has-type-scale (ht-next ht) (tsc :: sc) =
+has-type-scale here (tsc :: sc) = _ , _ , tsc , here
+has-type-scale (next ht) (tsc :: sc) =
   let _ , _ , ssc , ht' = has-type-scale ht sc in
-  _ , _ , ssc , ht-next ht'
+  _ , _ , ssc , next ht'
 
 not-in-name-null :
   ∀{k l Γ t s v w}
@@ -65,10 +65,10 @@ not-in-name-null :
   -> l ≢ k
   -> Lookup l Γ t v
   -> TNull t
-not-in-name-null (here _) nx ht-here = ⊥-elim (nx refl)
-not-in-name-null (here cz) _ (ht-next ht) = has-type-null ht cz
-not-in-name-null (next tnull _) _ ht-here = tnull
-not-in-name-null (next _ x) nx (ht-next ht) = not-in-name-null x (suc-≢ nx) ht
+not-in-name-null (here _) nx here = ⊥-elim (nx refl)
+not-in-name-null (here cz) _ (next ht) = has-type-null ht cz
+not-in-name-null (next tnull _) _ here = tnull
+not-in-name-null (next _ x) nx (next ht) = not-in-name-null x (suc-≢ nx) ht
 
 not-in-term-null :
   ∀{k Γ t s v w}
@@ -101,18 +101,18 @@ not-in-process-null (nin-send sp ne1 ne2) ht =
 not-in-process-null (nin-recv {t = t} sp niE nig) ht =
   let _ , _ , _ , _ , ts , htE , htP = has-type-split ht sp in
   t-null-null-split-null (not-in-term-null niE htE)
-                         (not-in-process-null (nig (witness (t .force))) (ht-next htP)) ts
+                         (not-in-process-null (nig (witness (t .force))) (next htP)) ts
   -- Applying f to a single witness suffices because the type
   -- which we want to prove unrestricted is always the same and
   -- does not depend on the witness
 not-in-process-null (nin-par sp niP niQ) ht =
   let _ , _ , _ , _ , ts , htP , htQ = has-type-split ht sp in
   t-null-null-split-null (not-in-process-null niP htP) (not-in-process-null niQ htQ) ts
-not-in-process-null (nin-new niP) ht = not-in-process-null niP (ht-next ht)
+not-in-process-null (nin-new niP) ht = not-in-process-null niP (next ht)
 not-in-process-null (nin-rep sc niP) ht =
   let _ , _ , tsc , ht' = has-type-scale ht sc in
   t-null-scale-null-l (not-in-process-null niP ht') tsc
 not-in-process-null (nin-let {t = t} {f = f} sp niE niP) ht =
   let _ , _ , _ , _ , ts , ht1 , ht2 = has-type-split ht sp in
   t-null-null-split-null (not-in-term-null niE ht1)
-                   (not-in-process-null niP (ht-next (ht-next ht2))) ts
+                   (not-in-process-null niP (next (next ht2))) ts

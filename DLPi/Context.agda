@@ -29,7 +29,7 @@ data Context : Set₁ where
 
 data CNull : Context -> Set₁ where
   []   : CNull []
-  _::_ : ∀{t v Γ} -> TNull t -> CNull Γ -> CNull (t # v :: Γ)
+  _::_ : ∀{t p Γ} -> TNull t -> CNull Γ -> CNull (t # p :: Γ)
 
 data CSplit : Context → Context → Context → Set₁ where
   []   : CSplit [] [] []
@@ -40,8 +40,8 @@ data CScale : Context -> Context -> Set₁ where
   _::_ : ∀{Γ Δ t s v w} -> TScale t s v w -> CScale Γ Δ -> CScale (t # v :: Γ) (s # w :: Δ)
 
 data Lookup : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
-  ht-here : ∀{Γ t v} -> Lookup zero (t # v :: Γ) t v
-  ht-next : ∀{Γ t s v w k} -> Lookup k Γ t v -> Lookup (suc k) (s # w :: Γ) t v
+  here : ∀{Γ t v} -> Lookup zero (t # v :: Γ) t v
+  next : ∀{Γ t s v w k} -> Lookup k Γ t v -> Lookup (suc k) (s # w :: Γ) t v
 
 c-null-null-split-null : ∀{Γ Γ1 Γ2} -> CNull Γ1 -> CNull Γ2 -> CSplit Γ Γ1 Γ2 -> CNull Γ
 c-null-null-split-null [] [] [] = []
