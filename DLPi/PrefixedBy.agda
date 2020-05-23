@@ -105,7 +105,7 @@ weaken-prefixed {_} {_} {m} {n} we (Send sp (name x) V) (prefixed-send _) =
 weaken-prefixed {_} {_} {m} {n} we (Recv sp (name x) P) (prefixed-recv _) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   let x' = weaken-name we1 x in
-  -- let P' = weaken-process (weaken-next we2) P in -- TODO: WHAT IS THIS FOR?
+  -- let P' = weaken-process (next we2) P in -- TODO: WHAT IS THIS FOR?
   prefixed-recv sp'
 weaken-prefixed we (Par sp P Q) (prefixed-par-l _ pb) =
   let _ , _ , sp' , we' , _ = weaken-split we sp in
@@ -114,7 +114,7 @@ weaken-prefixed we (Par sp P Q) (prefixed-par-r _ pb) =
   let _ , _ , sp' , _ , we' = weaken-split we sp in
   prefixed-par-r sp' (weaken-prefixed we' Q pb)
 weaken-prefixed we (New P) (prefixed-new pb) =
-  prefixed-new (weaken-prefixed (weaken-next we) P pb)
+  prefixed-new (weaken-prefixed (next we) P pb)
 weaken-prefixed we (Rep sc P) (prefixed-rep pb) =
   let _ , we' , sc' = weaken-scale we sc in
   prefixed-rep (weaken-prefixed we' P pb)
@@ -161,7 +161,7 @@ strengthen-prefixed we (Send sp (name x) V) (nin-send _ (nin-v neq) niv) (prefix
 strengthen-prefixed we (Recv sp (name x) P) (nin-recv _ (nin-v neq) nip) (prefixed-recv _) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
   let x' = strengthen-name we1 x neq in
-  -- let P' = strengthen-process (weaken-next we2) P nip in -- TODO: WHAT IS THIS FOR?
+  -- let P' = strengthen-process (next we2) P nip in -- TODO: WHAT IS THIS FOR?
   prefixed-recv sp'
 strengthen-prefixed we (Par sp P _) (nin-par _ nip _) (prefixed-par-l _ pb) =
   let _ , _ , sp' , we' , _ = strengthen-split we sp in
@@ -170,7 +170,7 @@ strengthen-prefixed we (Par sp _ Q) (nin-par _ _ niq) (prefixed-par-r _ pb) =
   let _ , _ , sp' , _ , we' = strengthen-split we sp in
   prefixed-par-r sp' (strengthen-prefixed we' Q niq pb)
 strengthen-prefixed we (New P) (nin-new nip) (prefixed-new pb) =
-  prefixed-new (strengthen-prefixed (weaken-next we) P nip pb)
+  prefixed-new (strengthen-prefixed (next we) P nip pb)
 strengthen-prefixed we (Rep sc P) (nin-rep _ nip) (prefixed-rep pb) =
   let _ , we' , _ = strengthen-scale we sc in
   prefixed-rep (strengthen-prefixed we' P nip pb)
@@ -211,12 +211,12 @@ prefixed-cong (prefixed-par-l _ (prefixed-new pb)) (cong-par-new {σ = m} {ρ = 
   prefixed-new (prefixed-par-l sp' pb)
 prefixed-cong (prefixed-par-r {Q = Q} _ pb) (cong-par-new {σ = m} {ρ = n} sp) =
   let sp' = split-c (msplit-l m) (msplit-l n) :: sp in
-  let we = weaken-here null-c in
+  let we = here null-c in
   prefixed-new (prefixed-par-r sp' (weaken-prefixed we Q pb))
 prefixed-cong (prefixed-new (prefixed-par-l _ pb)) (cong-new-par sp _) =
   prefixed-par-l sp (prefixed-new pb)
 prefixed-cong (prefixed-new {m' = m} {n' = n} (prefixed-par-r {Q = Q} _ pb)) (cong-new-par sp niQ) =
-  prefixed-par-r sp (strengthen-prefixed (weaken-here null-c) Q niQ pb)
+  prefixed-par-r sp (strengthen-prefixed (here null-c) Q niQ pb)
 prefixed-cong (prefixed-new ()) (cong-new-idle _)
 prefixed-cong (prefixed-rep pb) (cong-rep-par sc) = prefixed-par-l (c-scale-split sc) pb
 prefixed-cong (prefixed-par-l _ pb) (cong-par-rep _ _) = prefixed-rep pb

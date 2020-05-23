@@ -172,8 +172,8 @@ subst-result (insert-next ins) (next sz x) with subst-result ins x
 ... | not-found tu y = not-found tu (next sz y)
 
 insert-null-weaken : ∀{k Γ Δ t v} -> TNull t -> Insert k t v Γ Δ -> Weaken k Γ Δ
-insert-null-weaken tz insert-here = weaken-here tz
-insert-null-weaken tz (insert-next ins) = weaken-next (insert-null-weaken tz ins)
+insert-null-weaken tz insert-here = here tz
+insert-null-weaken tz (insert-next ins) = next (insert-null-weaken tz ins)
 
 insert-scale :
   ∀{k t Γ' Δ Δ' v} ->
@@ -241,7 +241,7 @@ subst-process sp V ins (Recv {t = t} sp1 E f) with split-insert sp1 ins
   Recv sp' E
            λ v -> let _ , _ , snull , ts = tsplit-r (t .force) in
                   (subst-process (ts :: spP)
-                                 (weaken-term (weaken-here snull) V2) (insert-next insP) (f v))
+                                 (weaken-term (here snull) V2) (insert-next insP) (f v))
 subst-process sp V ins (Par psp P Q) with split-insert psp ins
 ... | _ , _ , _ , _ , _ , _ , tsp , psp' , insP , insQ with split-term tsp V
 ... | _ , _ , esp' , V1 , V2 =
@@ -249,7 +249,7 @@ subst-process sp V ins (Par psp P Q) with split-insert psp ins
   Par sp' (subst-process spP V1 insP P) (subst-process spQ V2 insQ Q)
 subst-process sp e ins (New {_} {m} {n} P) =
   New (subst-process (split-c (msplit-r m) (msplit-r n) :: sp)
-                     (weaken-term (weaken-here null-c) e)
+                     (weaken-term (here null-c) e)
                      (insert-next ins) P)
 subst-process sp e ins (Rep sc P) with insert-scale ins sc
 ... | _ , _ , _ , ins' , scale-p , sc2 =
@@ -268,6 +268,6 @@ subst-process sp E ins (Let {t = t} {ft} sp1 F P) with split-insert sp1 ins
   let _ , _ , dnull , ds = tsplit-r (ft _) in
   Let sp' (subst-term sp1 E1 ins1 F)
           (subst-process (ts :: ds :: sp2)
-            (weaken-term (weaken-here tnull) (weaken-term (weaken-here dnull) E2))
+            (weaken-term (here tnull) (weaken-term (here dnull) E2))
             (insert-next (insert-next ins2))
             P)

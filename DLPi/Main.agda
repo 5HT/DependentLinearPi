@@ -120,7 +120,7 @@ recv-data null (suc n) =
        λ _ ->
   Let (split-l lin-p :: split-c split00 split00 :: c-null-split null)
       (name (here (null-c :: null))) $
-  weaken-process (weaken-here null-p) (recv-data (null-p :: null-c :: null) n)
+  weaken-process (here null-p) (recv-data (null-p :: null-c :: null) n)
 
 recv : Process (recv-type # _ :: [])
 recv =
@@ -129,7 +129,7 @@ recv =
        λ (n , _) ->
   Let (split-l lin-p :: split-c split00 split00 :: [])
       (name (here (null-c :: []))) $
-  weaken-process (weaken-here null-p) (recv-data (null-p :: null-c :: []) n)
+  weaken-process (here null-p) (recv-data (null-p :: null-c :: []) n)
 
 {- CERTIFIED ECHO SERVER -}
 

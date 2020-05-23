@@ -35,18 +35,18 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; subst; cong; cong₂; sym)
 
 data Weaken : ℕ -> Context -> Context -> Set₁ where
-  weaken-here : ∀{Γ t v} -> TNull t -> Weaken zero Γ (t # v :: Γ)
-  weaken-next : ∀{n Γ Δ mt v} -> Weaken n Γ Δ -> Weaken (suc n) (mt # v :: Γ) (mt # v :: Δ)
+  here : ∀{Γ t v} -> TNull t -> Weaken zero Γ (t # v :: Γ)
+  next : ∀{n Γ Δ mt v} -> Weaken n Γ Δ -> Weaken (suc n) (mt # v :: Γ) (mt # v :: Δ)
 
 {- NULL AND UNRESTRICTED -}
 
 weaken-null : ∀{n Γ Δ} -> Weaken n Γ Δ -> CNull Γ -> CNull Δ
-weaken-null (weaken-here tnull) null = tnull :: null
-weaken-null (weaken-next we) (tnull :: null) = tnull :: weaken-null we null
+weaken-null (here tnull) null = tnull :: null
+weaken-null (next we) (tnull :: null) = tnull :: weaken-null we null
 
 strengthen-null : ∀{n Γ Δ} -> Weaken n Γ Δ -> CNull Δ -> CNull Γ
-strengthen-null (weaken-here _) (_ :: cnull) = cnull
-strengthen-null (weaken-next we) (tz :: cnull) = tz :: strengthen-null we cnull
+strengthen-null (here _) (_ :: cnull) = cnull
+strengthen-null (next we) (tz :: cnull) = tz :: strengthen-null we cnull
 
 -- {- SPLIT WEAKENING AND STRENGTHENING -}
 
@@ -55,57 +55,57 @@ weaken-split :
   -> Weaken n Γ Δ
   -> CSplit Γ Γ1 Γ2
   -> ∃[ Δ1 ] ∃[ Δ2 ] (CSplit Δ Δ1 Δ2 × Weaken n Γ1 Δ1 × Weaken n Γ2 Δ2)
-weaken-split (weaken-here tz) sp =
-  _ , _ , t-null-split tz :: sp , weaken-here tz , weaken-here tz
-weaken-split (weaken-next we) (ts :: sp) =
+weaken-split (here tz) sp =
+  _ , _ , t-null-split tz :: sp , here tz , here tz
+weaken-split (next we) (ts :: sp) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
-  _ , _ , ts :: sp' , weaken-next we1 , weaken-next we2
+  _ , _ , ts :: sp' , next we1 , next we2
 
 strengthen-split :
   ∀{n Γ Δ Δ1 Δ2}
   -> Weaken n Γ Δ
   -> CSplit Δ Δ1 Δ2
   -> ∃[ Γ1 ] ∃[ Γ2 ] (CSplit Γ Γ1 Γ2 × Weaken n Γ1 Δ1 × Weaken n Γ2 Δ2)
-strengthen-split (weaken-here tnull) (ts :: sp) =
+strengthen-split (here tnull) (ts :: sp) =
   let tnull1 , tnull2 = t-null-split-null-null tnull ts in
-  _ , _ , sp , weaken-here tnull1 , weaken-here tnull2
-strengthen-split (weaken-next we) (ts :: sp) =
+  _ , _ , sp , here tnull1 , here tnull2
+strengthen-split (next we) (ts :: sp) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
-  _ , _ , ts :: sp' , weaken-next we1 , weaken-next we2
+  _ , _ , ts :: sp' , next we1 , next we2
 
 strengthen-split-eq :
   ∀{n Γ Δ Δ'}
   -> Weaken n Γ Δ
   -> CSplit Δ Δ' Δ'
   -> ∃[ Γ' ] (CSplit Γ Γ' Γ' × Weaken n Γ' Δ')
-strengthen-split-eq (weaken-here tnull) (ts :: sp) =
+strengthen-split-eq (here tnull) (ts :: sp) =
   let tnull1 , tnull2 = t-null-split-null-null tnull ts in
-  _ , sp , weaken-here tnull1
-strengthen-split-eq (weaken-next we) (ts :: sp) =
+  _ , sp , here tnull1
+strengthen-split-eq (next we) (ts :: sp) =
   let _ , sp' , we' = strengthen-split-eq we sp in
-  _ , ts :: sp' , weaken-next we'
+  _ , ts :: sp' , next we'
 
 weaken-scale :
   ∀{n Γ Γ' Δ'} ->
   Weaken n Γ' Δ' ->
   CScale Γ Γ' ->
   ∃[ Δ ] (Weaken n Γ Δ × CScale Δ Δ')
-weaken-scale (weaken-here tnull) cscale =
-  _ , weaken-here tnull , t-null-scale tnull :: cscale
-weaken-scale (weaken-next we) (tscale :: cscale) =
+weaken-scale (here tnull) cscale =
+  _ , here tnull , t-null-scale tnull :: cscale
+weaken-scale (next we) (tscale :: cscale) =
   let _ , we' , cscale' = weaken-scale we cscale in
-  _ , weaken-next we' , tscale :: cscale'
+  _ , next we' , tscale :: cscale'
 
 strengthen-scale :
   ∀{n Γ' Δ Δ'} ->
   Weaken n Γ' Δ' ->
   CScale Δ Δ' ->
   ∃[ Γ ] (Weaken n Γ Δ × CScale Γ Γ')
-strengthen-scale (weaken-here tnull) (tsc :: sc) =
-  _ , weaken-here (t-null-scale-null tnull tsc) , sc
-strengthen-scale (weaken-next we) (tsc :: sc) =
+strengthen-scale (here tnull) (tsc :: sc) =
+  _ , here (t-null-scale-null tnull tsc) , sc
+strengthen-scale (next we) (tsc :: sc) =
   let _ , we' , sc' = strengthen-scale we sc in
-  _ , weaken-next we' , tsc :: sc'
+  _ , next we' , tsc :: sc'
 
 {- NAMEIABLES -}
 
@@ -115,14 +115,14 @@ weaken-name-index (suc n) zero = zero
 weaken-name-index (suc n) (suc k) = suc (weaken-name-index n k)
 
 weaken-name : ∀{n k Γ Δ t v} -> Weaken n Γ Δ -> Name k Γ t v -> Name (weaken-name-index n k) Δ t v
-weaken-name (weaken-here tnull) x = next tnull x
-weaken-name (weaken-next we) (here null) = here (weaken-null we null)
-weaken-name (weaken-next we) (next tnull x) = next tnull (weaken-name we x)
+weaken-name (here tnull) x = next tnull x
+weaken-name (next we) (here null) = here (weaken-null we null)
+weaken-name (next we) (next tnull x) = next tnull (weaken-name we x)
 
 not-in-weakened-name : ∀{k n Γ Δ t v} -> Weaken n Γ Δ -> Name k Γ t v -> n ≢ weaken-name-index n k
-not-in-weakened-name (weaken-here _) _ = zero-not-suc
-not-in-weakened-name (weaken-next _) (here _) = suc-not-zero
-not-in-weakened-name (weaken-next we) (next _ x) = ≢-suc (not-in-weakened-name we x)
+not-in-weakened-name (here _) _ = zero-not-suc
+not-in-weakened-name (next _) (here _) = suc-not-zero
+not-in-weakened-name (next we) (next _ x) = ≢-suc (not-in-weakened-name we x)
 
 strengthen-name-index : (l : ℕ) -> (k : ℕ) -> l ≢ k -> ℕ
 strengthen-name-index zero zero neq = ⊥-elim (neq refl)
@@ -131,10 +131,10 @@ strengthen-name-index (suc l) zero _ = zero
 strengthen-name-index (suc l) (suc k) neq = suc (strengthen-name-index l k (suc-≢ neq))
 
 strengthen-name : ∀{k n Γ Δ t v} -> Weaken n Γ Δ -> Name k Δ t v -> (neq : n ≢ k) -> Name (strengthen-name-index n k neq) Γ t v
-strengthen-name (weaken-here _) (here _) neq = ⊥-elim (neq refl)
-strengthen-name (weaken-here _) (next _ x) _ = x
-strengthen-name (weaken-next we) (here cnull) _ = here (strengthen-null we cnull)
-strengthen-name (weaken-next we) (next tu x) neq = next tu (strengthen-name we x (suc-≢ neq))
+strengthen-name (here _) (here _) neq = ⊥-elim (neq refl)
+strengthen-name (here _) (next _ x) _ = x
+strengthen-name (next we) (here cnull) _ = here (strengthen-null we cnull)
+strengthen-name (next we) (next tu x) neq = next tu (strengthen-name we x (suc-≢ neq))
 
 {- VALUES -}
 
@@ -224,18 +224,18 @@ weaken-process we (Send sp ec em) =
   Send sp' (weaken-term we1 ec) (weaken-term we2 em)
 weaken-process we (Recv sp e f) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
-  Recv sp' (weaken-term we1 e) (λ x -> weaken-process (weaken-next we2) (f x))
+  Recv sp' (weaken-term we1 e) (λ x -> weaken-process (next we2) (f x))
 weaken-process we (Par sp P Q) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   Par sp' (weaken-process we1 P) (weaken-process we2 Q)
-weaken-process we (New P) = New (weaken-process (weaken-next we) P)
+weaken-process we (New P) = New (weaken-process (next we) P)
 weaken-process we (Rep sc P) =
   let _ , we' , sc' = weaken-scale we sc in
   Rep sc' (weaken-process we' P)
 weaken-process we (Let sp E P) =
    let _ , _ , sp' , we1 , we2 = weaken-split we sp in
    Let sp' (weaken-term we1 E)
-           (weaken-process (weaken-next (weaken-next we2)) P)
+           (weaken-process (next (next we2)) P)
 
 not-in-weakened-process :
   ∀{n Γ Δ}
@@ -248,18 +248,18 @@ not-in-weakened-process we (Send sp ec em) =
   nin-send sp' (not-in-weakened-term we1 ec) (not-in-weakened-term we2 em)
 not-in-weakened-process we (Recv sp e f) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
-  nin-recv sp' (not-in-weakened-term we1 e) (λ x -> not-in-weakened-process (weaken-next we2) (f x))
+  nin-recv sp' (not-in-weakened-term we1 e) (λ x -> not-in-weakened-process (next we2) (f x))
 not-in-weakened-process we (Par sp P Q) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   nin-par sp' (not-in-weakened-process we1 P) (not-in-weakened-process we2 Q)
-not-in-weakened-process we (New P) = nin-new (not-in-weakened-process (weaken-next we) P)
+not-in-weakened-process we (New P) = nin-new (not-in-weakened-process (next we) P)
 not-in-weakened-process we (Rep sc P) =
   let _ , we' , sc' = weaken-scale we sc in
   nin-rep sc' (not-in-weakened-process we' P)
 not-in-weakened-process we (Let sp E P) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   nin-let sp' (not-in-weakened-term we1 E)
-              (not-in-weakened-process (weaken-next (weaken-next we2)) P)
+              (not-in-weakened-process (next (next we2)) P)
 
 strengthen-process :
   ∀{k Γ Δ}
@@ -273,16 +273,16 @@ strengthen-process we (Send sp ec em) (nin-send _ nic nim) =
   Send sp' (strengthen-term we1 ec nic) (strengthen-term we2 em nim)
 strengthen-process we (Recv sp e f) (nin-recv _ nie niP) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
-  Recv sp' (strengthen-term we1 e nie) (λ x -> strengthen-process (weaken-next we2) (f x) (niP x))
+  Recv sp' (strengthen-term we1 e nie) (λ x -> strengthen-process (next we2) (f x) (niP x))
 strengthen-process we (Par sp P Q) (nin-par _ niP niQ) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
   Par sp' (strengthen-process we1 P niP) (strengthen-process we2 Q niQ)
 strengthen-process we (New P) (nin-new ni) =
-  New (strengthen-process (weaken-next we) P ni)
+  New (strengthen-process (next we) P ni)
 strengthen-process we (Rep sc P) (nin-rep _ niP) =
   let _ , we' , sc' = strengthen-scale we sc in
   Rep sc' (strengthen-process we' P niP)
 strengthen-process we (Let sp E P) (nin-let _ niE niP) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
   Let sp' (strengthen-term we1 E niE)
-          (strengthen-process (weaken-next (weaken-next we2)) P niP)
+          (strengthen-process (next (next we2)) P niP)

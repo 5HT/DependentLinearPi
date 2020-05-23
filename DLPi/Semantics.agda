@@ -78,19 +78,19 @@ data _<=_ : ∀{Γ} -> Process Γ -> Process Γ -> Set₁ where
     {Q  : Process ΓQ}
     (sp : CSplit Γ ΓP ΓQ) ->
     let sp' = split-c (msplit-l σ) (msplit-l ρ) :: sp in
-    let we = weaken-here null-c in
+    let we = here null-c in
     Par sp (New P) Q <= New (Par sp' P (weaken-process we Q))
   cong-new-par :
     ∀{Γ Γ1 Γ2 σ ρ t P Q}
     (sp : CSplit Γ Γ1 Γ2)
     (niQ : NotInProcess zero Q) ->
     let sp' = split-c (msplit-l σ) (msplit-l ρ) :: sp in
-    let we = weaken-here null-c in
+    let we = here null-c in
     New {_} {σ} {ρ} {t} (Par sp' P Q) <= Par sp (New P) (strengthen-process we Q niQ)
   cong-new-idle :
     ∀{Γ t}
     (cz : CNull (Chan #0 #0 t # _ :: Γ)) ->
-    New (Idle cz) <= Idle (strengthen-null (weaken-here null-c) cz)
+    New (Idle cz) <= Idle (strengthen-null (here null-c) cz)
   cong-idle-new :
     ∀{Γ t}
     (cz : CNull Γ) ->
@@ -126,10 +126,10 @@ cong-par-new-r :
   (P : Process Γ1)
   (Q : Process (Chan m n t # _ :: Γ2)) ->
   let sp' = split-c (msplit-r m) (msplit-r n) :: sp in
-  let we = weaken-here null-c in
+  let we = here null-c in
   Par sp P (New Q) <= New (Par sp' (weaken-process we P) Q)
 cong-par-new-r {Γ} {Γ1} {Γ2} {m} {n} {t} sp P Q =
-  let we = weaken-here null-c in
+  let we = here null-c in
   let sp' = split-c {m} {m} {#0} {n} {n} {#0} {t} (msplit-l m) (msplit-l n) :: (csplit-comm sp) in
   let spe = split-c {m} {#0} {m} {n} {#0} {n} {t} (msplit-r m) (msplit-r n) :: sp in
   let pc1 : Par sp P (New Q) <= Par (csplit-comm sp) (New Q) P
@@ -351,7 +351,7 @@ data _~~_~>_ : ∀{l Γ Δ} -> Process Γ -> (Γ == l => Δ) -> Process Δ -> Se
     (P   : Process (t # p :: (f p # q :: Γ2))) ->
     let _ , sp1' , sp2' = csplit-assoc-lr sp1 (csplit-comm sp2) in
     let _ , _ , dnull , ds = tsplit-r (f p) in
-    let M' = weaken-term (weaken-here dnull) M in
+    let M' = weaken-term (here dnull) M in
     let P1 = subst-process (ds :: sp2') M' insert-here P in
     Let sp1 (pair {f = f} sp2 M N) P ~~ tau ~> subst-process sp1' N insert-here P1
   r-par :

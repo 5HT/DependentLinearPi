@@ -96,4 +96,4 @@ weaken-pnf (Recv sp (name x) P) we (pnf-recv _) =
 weaken-pnf (Par sp P _) we (pnf-par _ pnf) =
   let _ , _ , sp' , we' , _ = weaken-split we sp in
   pnf-par sp' (weaken-pnf P we' pnf)
-weaken-pnf (New P) we (pnf-new pnf) = pnf-new (weaken-pnf P (weaken-next we) pnf)
+weaken-pnf (New P) we (pnf-new pnf) = pnf-new (weaken-pnf P (next we) pnf)
