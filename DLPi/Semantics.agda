@@ -71,7 +71,7 @@ data _<=_ : ∀{Γ} -> Process Γ -> Process Γ -> Set₁ where
   cong-new-new :
     ∀{Γ σ1 ρ1 σ2 ρ2 t1 t2}
     {P : Process (Chan σ1 ρ1 t1 # _ :: (Chan σ2 ρ2 t2 # _ :: Γ))}->
-    New (New P) <= New (New (swap-process swap-here P))
+    New (New P) <= New (New (swap-process here P))
   cong-par-new :
     ∀{Γ ΓP ΓQ σ ρ t}
     {P  : Process (Chan σ ρ t # _ :: ΓP)}

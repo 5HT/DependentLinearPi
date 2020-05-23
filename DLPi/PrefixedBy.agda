@@ -74,7 +74,7 @@ swap-prefixed {_} {_} {m} {n} {_} {Δ} sw (Send sp (name x) E) (prefixed-send _)
 swap-prefixed {_} {_} {m} {n} sw (Recv sp (name x) P) (prefixed-recv _) =
   let _ , _ , sp' , sw1 , sw2 = swap-split sw sp in
   let x' = swap-name sw1 x in
-  -- let P' = swap-process (swap-next sw2) P in -- TODO: WHAT IS THIS FOR?
+  -- let P' = swap-process (next sw2) P in -- TODO: WHAT IS THIS FOR?
   prefixed-recv sp'
 swap-prefixed sw (Par sp P Q) (prefixed-par-l _ pb) =
   let _ , _ , sp' , sw' , _ = swap-split sw sp in
@@ -85,7 +85,7 @@ swap-prefixed sw (Par sp P Q) (prefixed-par-r _ pb) =
   let pb' = swap-prefixed sw' Q pb in
   prefixed-par-r sp' pb'
 swap-prefixed sw (New P) (prefixed-new pb) =
-  let pb' = swap-prefixed (swap-next sw) P pb in
+  let pb' = swap-prefixed (next sw) P pb in
   prefixed-new pb'
 swap-prefixed sw (Rep sc P) (prefixed-rep pb) =
   let _ , sw' , sc' = swap-scale sw sc in
@@ -205,7 +205,7 @@ prefixed-cong (prefixed-par-r _ pb) (cong-par-assoc-lr sp1 sp2) =
   let _ , sp1' , sp2' = csplit-assoc-lr sp1 sp2 in
   prefixed-par-r sp1' (prefixed-par-r sp2' pb)
 prefixed-cong (prefixed-new (prefixed-new {P = P} pb)) cong-new-new =
-  prefixed-new (prefixed-new (swap-prefixed swap-here P pb))
+  prefixed-new (prefixed-new (swap-prefixed here P pb))
 prefixed-cong (prefixed-par-l _ (prefixed-new pb)) (cong-par-new {σ = m} {ρ = n} sp) =
   let sp' = split-c (msplit-l m) (msplit-l n) :: sp in
   prefixed-new (prefixed-par-l sp' pb)
