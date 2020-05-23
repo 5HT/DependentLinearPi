@@ -256,7 +256,7 @@ subst-process sp e ins (Rep sc P) with insert-scale ins sc
   let _ , sc1 , F = scale-term scale-p e in
   let _ , sc' , sp' = c-split-scale-scale sp sc1 sc2 in
   Rep sc' (subst-process sp' F ins' P)
-... | _ , _ , _ , ins' , tsc@(scale-c _ _) , sc2 =
+... | _ , _ , _ , ins' , tsc@(chan _ _) , sc2 =
   let _ , sc1 , F = scale-term tsc e in
   let _ , sc' , sp' = c-split-scale-scale sp sc1 sc2 in
   Rep sc' (subst-process sp' F ins' P)

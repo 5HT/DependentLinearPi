@@ -64,8 +64,8 @@ data TSplit : (t : Type) → (t1 : Type) → (t2 : Type) → ⟦ t ⟧ -> ⟦ t1
   split-c : ∀{m m1 m2 n n1 n2 t} → MSplit m m1 m2 → MSplit n n1 n2 → TSplit (Chan m n t) (Chan m1 n1 t) (Chan m2 n2 t) tt tt tt
 
 data TScale : (t : Type) -> (s : Type) -> ⟦ t ⟧ -> ⟦ s ⟧ -> Set₁ where
-  scale-p : ∀{A v} -> TScale (Pure A) (Pure A) v v
-  scale-c : ∀{σ σ' ρ ρ' t} -> MScale σ σ' -> MScale ρ ρ' -> TScale (Chan σ ρ t) (Chan σ' ρ' t) _ _
+  pure : ∀{A v} -> TScale (Pure A) (Pure A) v v
+  chan : ∀{σ σ' ρ ρ' t} -> MScale σ σ' -> MScale ρ ρ' -> TScale (Chan σ ρ t) (Chan σ' ρ' t) _ _
 
 t-null-split-null-null : ∀{t t1 t2 v v1 v2} -> TNull t -> TSplit t t1 t2 v v1 v2 -> TNull t1 × TNull t2
 t-null-split-null-null pure split-p = pure , pure

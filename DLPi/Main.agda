@@ -41,7 +41,7 @@ open import Data.Product
 {- SERVER THAT COMPUTES THE SUCCESSOR OF A NATURAL NUMBER -}
 successor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ))) # _ :: [])
 successor =
-  Rep (scale-c scale1ω scale00 :: []) $
+  Rep (chan scale1ω scale00 :: []) $
   Recv (split-c split10 split00 :: [])
        (name (here []))
        λ (x , _) ->
@@ -55,7 +55,7 @@ successor =
 {- SERVER THAT COMPUTES THE PREDECESSOR OF A NON-NULL NATURAL NUMBER -}
 predecessor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Pair (Pure (n ≢ 0)) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ)))) # _ :: [])
 predecessor =
-  Rep (scale-c scale1ω scale00 :: []) $
+  Rep (chan scale1ω scale00 :: []) $
   Recv (split-c split10 split00 :: [])
        (name (here []))
        λ (x , p , _) ->
@@ -134,7 +134,7 @@ recv =
 {- CERTIFIED ECHO SERVER -}
 
 echo : Process (Chan #ω #0 (fold (Pair (Pure ℕ) (λ x -> Chan #0 #1 (fold (Pair (Pure ℕ) λ y -> Pure (x ≡ y)))))) # _ :: [])
-echo = Rep ((scale-c scale1ω scale00) :: []) $
+echo = Rep ((chan scale1ω scale00) :: []) $
        Recv (split-c split10 split00 :: [])
             (name (here []))
             λ (x , _) ->
