@@ -39,17 +39,17 @@ data MSplit : Multiplicity → Multiplicity → Multiplicity → Set where
   ω+1 : MSplit #ω #ω #1
   ω+ω : MSplit #ω #ω #ω
 
-msplit-l : (m : Multiplicity) -> MSplit m m #0
+msplit-l : (σ : Multiplicity) -> MSplit σ σ #0
 msplit-l #0 = 0+0
 msplit-l #1 = 1+0
 msplit-l #ω = ω+0
 
-msplit-r : (m : Multiplicity) -> MSplit m #0 m
+msplit-r : (σ : Multiplicity) -> MSplit σ #0 σ
 msplit-r #0 = 0+0
 msplit-r #1 = 0+1
 msplit-r #ω = 0+ω
 
-msplit-comm : {m m1 m2 : Multiplicity} -> MSplit m m1 m2 -> MSplit m m2 m1
+msplit-comm : {σ σ1 σ2 : Multiplicity} -> MSplit σ σ1 σ2 -> MSplit σ σ2 σ1
 msplit-comm 0+0 = 0+0
 msplit-comm 0+1 = 1+0
 msplit-comm 0+ω = ω+0
@@ -61,7 +61,7 @@ msplit-comm ω+1 = 1+ω
 msplit-comm ω+ω = ω+ω
 
 msplit-comm-inv :
-  {m m1 m2 : Multiplicity} -> (sp : MSplit m m1 m2) -> msplit-comm (msplit-comm sp) ≡ sp
+  {σ σ1 σ2 : Multiplicity} -> (sp : MSplit σ σ1 σ2) -> msplit-comm (msplit-comm sp) ≡ sp
 msplit-comm-inv 0+0 = refl
 msplit-comm-inv 0+1 = refl
 msplit-comm-inv 0+ω = refl
@@ -72,16 +72,16 @@ msplit-comm-inv ω+0 = refl
 msplit-comm-inv ω+1 = refl
 msplit-comm-inv ω+ω = refl
 
-msplit-comm-lr : (m : Multiplicity) -> msplit-comm (msplit-l m) ≡ msplit-r m
+msplit-comm-lr : (σ : Multiplicity) -> msplit-comm (msplit-l σ) ≡ msplit-r σ
 msplit-comm-lr #0 = refl
 msplit-comm-lr #1 = refl
 msplit-comm-lr #ω = refl
 
 msplit-assoc-rl :
-  ∀{m m1 m23 m2 m3}
-  -> MSplit m m1 m23
-  -> MSplit m23 m2 m3
-  -> ∃[ n ] (MSplit m n m3 × MSplit n m1 m2)
+  ∀{σ σ1 σ23 σ2 m3}
+  -> MSplit σ σ1 σ23
+  -> MSplit σ23 σ2 m3
+  -> ∃[ ρ ] (MSplit σ ρ m3 × MSplit ρ σ1 σ2)
 msplit-assoc-rl 0+0 0+0 = #0 , 0+0 , 0+0
 msplit-assoc-rl 0+1 0+1 = #0 , 0+1 , 0+0
 msplit-assoc-rl 0+1 1+0 = #1 , 1+0 , 0+1
@@ -111,20 +111,20 @@ msplit-assoc-rl ω+ω ω+1 = #ω , ω+1 , ω+ω
 msplit-assoc-rl ω+ω ω+ω = #ω , ω+ω , ω+ω
 
 msplit-assoc-lr :
-  ∀{m m12 m1 m2 m3}
-  -> MSplit m m12 m3
-  -> MSplit m12 m1 m2
-  -> ∃[ n ] (MSplit m m1 n × MSplit n m2 m3)
+  ∀{σ σ12 σ1 σ2 m3}
+  -> MSplit σ σ12 m3
+  -> MSplit σ12 σ1 σ2
+  -> ∃[ ρ ] (MSplit σ σ1 ρ × MSplit ρ σ2 m3)
 msplit-assoc-lr ms1 ms2 =
   let _ , ms1' , ms2' = msplit-assoc-rl (msplit-comm ms1) (msplit-comm ms2) in
   _ , msplit-comm ms1' , msplit-comm ms2'
 
 m-split-split-split :
-  ∀{n m1 m2 m11 m12 m21 m22}
-  -> MSplit n m1 m2
-  -> MSplit m1 m11 m12
-  -> MSplit m2 m21 m22
-  -> ∃[ n1 ] ∃[ n2 ] (MSplit n n1 n2 × MSplit n1 m11 m21 × MSplit n2 m12 m22)
+  ∀{ρ σ1 σ2 σ11 σ12 σ21 σ22}
+  -> MSplit ρ σ1 σ2
+  -> MSplit σ1 σ11 σ12
+  -> MSplit σ2 σ21 σ22
+  -> ∃[ ρ1 ] ∃[ ρ2 ] (MSplit ρ ρ1 ρ2 × MSplit ρ1 σ11 σ21 × MSplit ρ2 σ12 σ22)
 m-split-split-split sp sp1 sp2 =
   let _ , sp1 , sp = msplit-assoc-lr sp sp1 in
   let _ , sp2 , sp = msplit-assoc-rl sp sp2 in
@@ -133,3 +133,23 @@ m-split-split-split sp sp1 sp2 =
   let _ , sp , sp1 = msplit-assoc-rl sp1 sp in
   _ , _ , sp , sp1 , sp2
 
+m-scale-split : ∀{σ ρ} -> MScale σ ρ -> MSplit ρ σ ρ
+m-scale-split 0·0 = 0+0
+m-scale-split 1·ω = 1+ω
+m-scale-split ω·ω = ω+ω
+
+m-split-scale-scale :
+  ∀{σ1 σ2 ρ ρ1 ρ2} ->
+  MSplit ρ ρ1 ρ2 ->
+  MScale σ1 ρ1 ->
+  MScale σ2 ρ2 ->
+  ∃[ σ ] (MScale σ ρ × MSplit σ σ1 σ2)
+m-split-scale-scale 0+0 0·0 0·0 = _ , 0·0 , 0+0
+m-split-scale-scale 0+ω 0·0 1·ω = _ , 1·ω , 0+1
+m-split-scale-scale 0+ω 0·0 ω·ω = _ , ω·ω , 0+ω
+m-split-scale-scale ω+0 1·ω 0·0 = _ , 1·ω , 1+0
+m-split-scale-scale ω+0 ω·ω 0·0 = _ , ω·ω , ω+0
+m-split-scale-scale ω+ω 1·ω 1·ω = _ , ω·ω , 1+1
+m-split-scale-scale ω+ω 1·ω ω·ω = _ , ω·ω , 1+ω
+m-split-scale-scale ω+ω ω·ω 1·ω = _ , ω·ω , ω+1
+m-split-scale-scale ω+ω ω·ω ω·ω = _ , ω·ω , ω+ω

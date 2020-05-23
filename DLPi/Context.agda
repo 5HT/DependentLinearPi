@@ -33,15 +33,15 @@ data CNull : Context -> Set₁ where
 
 data CSplit : Context → Context → Context → Set₁ where
   []   : CSplit [] [] []
-  _::_ : ∀{t t1 t2 Γ Γ1 Γ2 v v1 v2} → TSplit t t1 t2 v v1 v2 → CSplit Γ Γ1 Γ2 → CSplit (t # v :: Γ) (t1 # v1 :: Γ1) (t2 # v2 :: Γ2)
+  _::_ : ∀{t t1 t2 Γ Γ1 Γ2 p p1 p2} → TSplit t t1 t2 p p1 p2 → CSplit Γ Γ1 Γ2 → CSplit (t # p :: Γ) (t1 # p1 :: Γ1) (t2 # p2 :: Γ2)
 
 data CScale : Context -> Context -> Set₁ where
   []   : CScale [] []
-  _::_ : ∀{Γ Δ t s v w} -> TScale t s v w -> CScale Γ Δ -> CScale (t # v :: Γ) (s # w :: Δ)
+  _::_ : ∀{Γ Δ t s p w} -> TScale t s p w -> CScale Γ Δ -> CScale (t # p :: Γ) (s # w :: Δ)
 
 data Lookup : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
-  here : ∀{Γ t v} -> Lookup zero (t # v :: Γ) t v
-  next : ∀{Γ t s v w k} -> Lookup k Γ t v -> Lookup (suc k) (s # w :: Γ) t v
+  here : ∀{Γ t p} -> Lookup zero (t # p :: Γ) t p
+  next : ∀{Γ t s p w k} -> Lookup k Γ t p -> Lookup (suc k) (s # w :: Γ) t p
 
 c-null-null-split-null : ∀{Γ Γ1 Γ2} -> CNull Γ1 -> CNull Γ2 -> CSplit Γ Γ1 Γ2 -> CNull Γ
 c-null-null-split-null [] [] [] = []
@@ -52,15 +52,15 @@ csplit-comm : ∀{Γ Γ1 Γ2} -> CSplit Γ Γ1 Γ2 -> CSplit Γ Γ2 Γ1
 csplit-comm [] = []
 csplit-comm (ts :: sp) = tsplit-comm ts :: csplit-comm sp
 
-csplit-comm-inv : ∀{Γ Γ1 Γ2} -> (sp : CSplit Γ Γ1 Γ2) -> csplit-comm (csplit-comm sp) ≡ sp
+csplit-comm-inv : ∀{Γ Γ1 Γ2} (sp : CSplit Γ Γ1 Γ2) -> csplit-comm (csplit-comm sp) ≡ sp
 csplit-comm-inv [] = refl
 csplit-comm-inv (ts :: sp) = cong₂ _::_ (tsplit-comm-inv ts) (csplit-comm-inv sp)
 
 csplit-assoc-rl :
-  ∀{Γ Γ1 Γ23 Γ2 Γ3}
-  -> CSplit Γ Γ1 Γ23
-  -> CSplit Γ23 Γ2 Γ3
-  -> ∃ λ Δ -> CSplit Γ Δ Γ3 × CSplit Δ Γ1 Γ2
+  ∀{Γ Γ1 Γ23 Γ2 Γ3} ->
+  CSplit Γ Γ1 Γ23 ->
+  CSplit Γ23 Γ2 Γ3 ->
+  ∃[ Δ ] (CSplit Γ Δ Γ3 × CSplit Δ Γ1 Γ2)
 csplit-assoc-rl [] [] = [] , [] , []
 csplit-assoc-rl (ts1 :: sp1) (ts2 :: sp2) =
   let _ , _ , ts1 , ts2 = tsplit-assoc-rl ts1 ts2 in
@@ -68,10 +68,10 @@ csplit-assoc-rl (ts1 :: sp1) (ts2 :: sp2) =
   _ , ts1 :: sp1 , ts2 :: sp2
 
 csplit-assoc-lr :
-  ∀{Γ Γ12 Γ1 Γ2 Γ3}
-  -> CSplit Γ Γ12 Γ3
-  -> CSplit Γ12 Γ1 Γ2
-  -> ∃ λ Δ -> CSplit Γ Γ1 Δ × CSplit Δ Γ2 Γ3
+  ∀{Γ Γ12 Γ1 Γ2 Γ3} ->
+  CSplit Γ Γ12 Γ3 ->
+  CSplit Γ12 Γ1 Γ2 ->
+  ∃[ Δ ] (CSplit Γ Γ1 Δ × CSplit Δ Γ2 Γ3)
 csplit-assoc-lr sp1 sp2 =
   let sp1 = csplit-comm sp1 in
   let sp2 = csplit-comm sp2 in
@@ -80,14 +80,14 @@ csplit-assoc-lr sp1 sp2 =
   let sp2 = csplit-comm sp2 in
   _ , sp1 , sp2
 
-csplit-l : ∀(Γ : Context) -> ∃[ Δ ] (CNull Δ × CSplit Γ Γ Δ)
+csplit-l : (Γ : Context) -> ∃[ Δ ] (CNull Δ × CSplit Γ Γ Δ)
 csplit-l [] = _ , [] , []
 csplit-l (t # _ :: Γ) =
   let _ , _ , tnull , ts = tsplit-l t in
   let _ , cnull , sp = csplit-l Γ in
   _ , tnull :: cnull , ts :: sp
 
-csplit-r : ∀(Γ : Context) -> ∃[ Δ ] (CNull Δ × CSplit Γ Δ Γ)
+csplit-r : (Γ : Context) -> ∃[ Δ ] (CNull Δ × CSplit Γ Δ Γ)
 csplit-r Γ =
   let _ , cnull , sp = csplit-l Γ in
   _ , cnull , csplit-comm sp
@@ -97,12 +97,11 @@ c-null-split [] = []
 c-null-split (tnull :: Γ) = t-null-split tnull :: c-null-split Γ
 
 c-split-split-split :
-  ∀{Δ Γ1 Γ2 Γ11 Γ12 Γ21 Γ22}
-  -> CSplit Δ Γ1 Γ2
-  -> CSplit Γ1 Γ11 Γ12
-  -> CSplit Γ2 Γ21 Γ22
-  -> ∃ λ Δ1 -> ∃ λ Δ2
-  -> CSplit Δ Δ1 Δ2 × CSplit Δ1 Γ11 Γ21 × CSplit Δ2 Γ12 Γ22
+  ∀{Δ Γ1 Γ2 Γ11 Γ12 Γ21 Γ22} ->
+  CSplit Δ Γ1 Γ2 ->
+  CSplit Γ1 Γ11 Γ12 ->
+  CSplit Γ2 Γ21 Γ22 ->
+  ∃[ Δ1 ] ∃[ Δ2 ] (CSplit Δ Δ1 Δ2 × CSplit Δ1 Γ11 Γ21 × CSplit Δ2 Γ12 Γ22)
 c-split-split-split sp sp1 sp2 =
   let _ , sp1 , sp = csplit-assoc-lr sp sp1 in
   let _ , sp2 , sp = csplit-assoc-rl sp sp2 in
@@ -111,3 +110,22 @@ c-split-split-split sp sp1 sp2 =
   let _ , sp , sp1 = csplit-assoc-rl sp1 sp in
   _ , _ , sp , sp1 , sp2
 
+c-null-scale : ∀{Γ} -> CNull Γ -> CScale Γ Γ
+c-null-scale [] = []
+c-null-scale (tnull :: null) = t-null-scale tnull :: c-null-scale null
+
+c-scale-split : ∀{Γ Δ} -> CScale Γ Δ -> CSplit Δ Γ Δ
+c-scale-split [] = []
+c-scale-split (tsc :: sc) = t-scale-split tsc :: c-scale-split sc
+
+c-split-scale-scale :
+  ∀{Γ1 Γ2 Δ Δ1 Δ2} ->
+  CSplit Δ Δ1 Δ2 ->
+  CScale Γ1 Δ1 ->
+  CScale Γ2 Δ2 ->
+  ∃[ Γ ] (CScale Γ Δ × CSplit Γ Γ1 Γ2)
+c-split-scale-scale [] [] [] = _ , [] , []
+c-split-scale-scale (ts :: sp) (tsc1 :: sc1) (tsc2 :: sc2) =
+  let _ , _ , tsc , ts' = t-split-scale-scale ts tsc1 tsc2 in
+  let _ , sc , sp' = c-split-scale-scale sp sc1 sc2 in
+  _ , tsc :: sc , ts' :: sp'

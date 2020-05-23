@@ -32,7 +32,6 @@ open import Type
 open import Context
 open import Language
 open import Weakening
-open import Scaling
 
 has-type-split :
   ∀{Γ Γ1 Γ2 k t v}

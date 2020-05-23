@@ -31,7 +31,6 @@ open import Language
 open import Semantics
 open import PrefixedBy
 open import Weakening
-open import Scaling
 
 data PrefixNormalForm : ∀{Γ} -> ℕ -> Multiplicity -> Multiplicity -> Process Γ -> Set where
   pnf-send :

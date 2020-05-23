@@ -32,17 +32,17 @@ open import Type
 open import Context
 open import Language
 open import Weakening
-open import Scaling
 
 data Insert : ℕ -> (t : Type) -> ⟦ t ⟧ -> Context -> Context -> Set where
   here : ∀{Γ t v} -> Insert zero t v Γ (t # v :: Γ)
   next : ∀{Γ Δ t s v w k} -> Insert k t v Γ Δ -> Insert (suc k) t v (s # w :: Γ) (s # w :: Δ)
 
-split-insert : ∀{Γ Δ Δ1 Δ2 k t v}
-  -> CSplit Δ Δ1 Δ2
-  -> Insert k t v Γ Δ
-  -> ∃[ t1 ] ∃[ t2 ] ∃[ Γ1 ] ∃[ Γ2 ] ∃[ v1 ] ∃[ v2 ]
-     (TSplit t t1 t2 v v1 v2 × CSplit Γ Γ1 Γ2 × Insert k t1 v1 Γ1 Δ1 × Insert k t2 v2 Γ2 Δ2)
+split-insert :
+  ∀{Γ Δ Δ1 Δ2 k t v} ->
+  CSplit Δ Δ1 Δ2 ->
+  Insert k t v Γ Δ ->
+  ∃[ t1 ] ∃[ t2 ] ∃[ Γ1 ] ∃[ Γ2 ] ∃[ v1 ] ∃[ v2 ]
+    (TSplit t t1 t2 v v1 v2 × CSplit Γ Γ1 Γ2 × Insert k t1 v1 Γ1 Δ1 × Insert k t2 v2 Γ2 Δ2)
 split-insert (ts :: sp) here =
   _ , _ , _ , _ , _ , _ , ts , sp , here , here
 split-insert (ss :: sp) (next ins) =
@@ -174,6 +174,26 @@ subst-result (next ins) (next sz x) with subst-result ins x
 insert-null-weaken : ∀{k Γ Δ t v} -> TNull t -> Insert k t v Γ Δ -> Weaken k Γ Δ
 insert-null-weaken tz here = here tz
 insert-null-weaken tz (next ins) = next (insert-null-weaken tz ins)
+
+scale-name :
+  ∀{k Δ t s v w} ->
+  TScale t s v w ->
+  Name k Δ s w ->
+  ∃[ Γ ] (CScale Γ Δ × Name k Γ t v)
+scale-name sc (here null) = _ , sc :: c-null-scale null , here null
+scale-name sc (next tnull x) =
+  let _ , sc' , y = scale-name sc x in
+  _ , t-null-scale tnull :: sc' , next tnull y
+
+scale-term :
+  ∀{Δ s t v w} ->
+  TScale t s v w ->
+  Term Δ s w ->
+  ∃[ Γ ] (CScale Γ Δ × Term Γ t v)
+scale-term sc (name x) =
+  let _ , sc , x = scale-name sc x in
+  _ , sc , name x
+scale-term pure (pure null c) = _ , c-null-scale null , pure null c
 
 insert-scale :
   ∀{k t Γ' Δ Δ' v} ->

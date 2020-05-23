@@ -30,7 +30,6 @@ open import Language
 open import Swapping
 open import Weakening
 open import Substitution
-open import Scaling
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; cong; cong₂; sym; subst; subst₂)

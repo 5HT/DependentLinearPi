@@ -30,7 +30,6 @@ open import Language
 open import Semantics
 open import Swapping
 open import Weakening
-open import Scaling
 
 data PrefixedBy : ∀{Γ} -> ℕ -> Multiplicity -> Multiplicity -> Process Γ -> Set where
   prefixed-send :
