@@ -61,8 +61,8 @@ data Process : Context -> Set₁ where
     Process Γ
   Rep : ∀{Γ Δ} -> CScale Γ Δ -> Process Γ -> Process Δ
   Let :
-    ∀{Γ Γ1 Γ2 t f v w} ->
+    ∀{Γ Γ1 Γ2 t f p q} ->
     CSplit Γ Γ1 Γ2 ->
-    Term Γ1 (Pair t f) (v , w) ->
-    ((x : ⟦ t ⟧) (y : ⟦ f x ⟧) -> Process (t # x :: (f x # y :: Γ2))) ->
+    Term Γ1 (Pair t f) (p , q) ->
+    Process (t # p :: (f p # q :: Γ2)) ->
     Process Γ

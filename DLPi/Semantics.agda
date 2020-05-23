@@ -339,21 +339,21 @@ data _~~_~>_ : ∀{l Γ Δ} -> Process Γ -> (Γ == l => Δ) -> Process Δ -> Se
     Par sp (Send sp1 (var x) M) (Recv sp2 (var y) F)
     ~~ α ~>
     subst-process sp' N insert-here (F (cast-pure (cong (λ p -> p .force) teq) v))
-  r-split :
+  r-let :
     ∀{Γ Γ1 Γ2 Γ11 Γ12 t}
     (f   : ⟦ t ⟧ -> Type)
     (sp1 : CSplit Γ Γ1 Γ2)
     (sp2 : CSplit Γ1 Γ11 Γ12)
-    {v   : ⟦ t ⟧}
-    {w   : ⟦ f v ⟧}
-    {M   : Term Γ11 t v}
-    {N   : Term Γ12 (f v) w}
-    (G   : (x : ⟦ t ⟧) (y : ⟦ f x ⟧) -> Process (t # x :: (f x # y :: Γ2))) ->
+    {p   : ⟦ t ⟧}
+    {q   : ⟦ f p ⟧}
+    {M   : Term Γ11 t p}
+    {N   : Term Γ12 (f p) q}
+    (P   : Process (t # p :: (f p # q :: Γ2))) ->
     let _ , sp1' , sp2' = csplit-assoc-lr sp1 (csplit-comm sp2) in
-    let _ , _ , dnull , ds = tsplit-r (f v) in
+    let _ , _ , dnull , ds = tsplit-r (f p) in
     let M' = weaken-term (weaken-here dnull) M in
-    let P1 = subst-process (ds :: sp2') M' insert-here (G v w) in
-    Let sp1 (pair sp2 M N) G ~~ tau ~> subst-process sp1' N insert-here P1
+    let P1 = subst-process (ds :: sp2') M' insert-here P in
+    Let sp1 (pair {f = f} sp2 M N) P ~~ tau ~> subst-process sp1' N insert-here P1
   r-par :
     ∀{Γ Γ1 Δ1 Γ2 l}
     {P  : Process Γ1}

@@ -260,15 +260,14 @@ subst-process sp e ins (Rep sc P) with insert-scale ins sc
   let _ , sc1 , F = scale-term tsc e in
   let _ , sc' , sp' = c-split-scale-scale sp sc1 sc2 in
   Rep sc' (subst-process sp' F ins' P)
-subst-process sp E ins (Let {t = t} {ft} sp1 F g) with split-insert sp1 ins
+subst-process sp E ins (Let {t = t} {ft} sp1 F P) with split-insert sp1 ins
 ... | _ , _ , _ , _ , _ , _ , tsp , sp1' , ins1 , ins2 with split-term tsp E
 ... | _ , _ , esp' , E1 , E2 =
   let _ , _ , sp' , sp1 , sp2 = c-split-split-split sp esp' sp1' in
-  let F = subst-term sp1 E1 ins1 F in
-  Let sp' F
-          λ v w -> let _ , _ , tnull , ts = tsplit-r t in
-                   let _ , _ , dnull , ds = tsplit-r (ft _) in
-                   subst-process (ts :: ds :: sp2)
-                                 (weaken-term (weaken-here tnull) (weaken-term (weaken-here dnull) E2))
-                                 (insert-next (insert-next ins2))
-                                 (g v w)
+  let _ , _ , tnull , ts = tsplit-r t in
+  let _ , _ , dnull , ds = tsplit-r (ft _) in
+  Let sp' (subst-term sp1 E1 ins1 F)
+          (subst-process (ts :: ds :: sp2)
+            (weaken-term (weaken-here tnull) (weaken-term (weaken-here dnull) E2))
+            (insert-next (insert-next ins2))
+            P)

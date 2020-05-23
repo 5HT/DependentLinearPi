@@ -211,11 +211,11 @@ data NotInProcess : ∀{Γ} -> ℕ -> Process Γ -> Set₁ where
     -> NotInProcess k (Rep sc P)
   nin-let :
     ∀{k Γ Γ1 Γ2 t}{f : ⟦ t ⟧ -> Type}{v w}{E : Term Γ1 (Pair t f) (v , w)}
-    {g : (v : ⟦ t ⟧) (w : ⟦ f v ⟧) -> Process (t # v :: (f v # w :: Γ2))}
+    {P : Process (t # v :: (f v # w :: Γ2))}
     → (sp : CSplit Γ Γ1 Γ2)
     → NotInTerm k E
-    → ((v : ⟦ t ⟧) (w : ⟦ f v ⟧) -> NotInProcess (suc (suc k)) (g v w))
-    → NotInProcess k (Let sp E g)
+    → NotInProcess (suc (suc k)) P
+    → NotInProcess k (Let sp E P)
 
 weaken-process : ∀{n Γ Δ} -> Weaken n Γ Δ -> Process Γ -> Process Δ
 weaken-process we (Idle cnull) = Idle (weaken-null we cnull)
@@ -232,10 +232,10 @@ weaken-process we (New P) = New (weaken-process (weaken-next we) P)
 weaken-process we (Rep sc P) =
   let _ , we' , sc' = weaken-scale we sc in
   Rep sc' (weaken-process we' P)
-weaken-process we (Let sp E g) =
+weaken-process we (Let sp E P) =
    let _ , _ , sp' , we1 , we2 = weaken-split we sp in
    Let sp' (weaken-term we1 E)
-           (λ v w -> weaken-process (weaken-next (weaken-next we2)) (g v w))
+           (weaken-process (weaken-next (weaken-next we2)) P)
 
 not-in-weakened-process :
   ∀{n Γ Δ}
@@ -256,10 +256,10 @@ not-in-weakened-process we (New P) = nin-new (not-in-weakened-process (weaken-ne
 not-in-weakened-process we (Rep sc P) =
   let _ , we' , sc' = weaken-scale we sc in
   nin-rep sc' (not-in-weakened-process we' P)
-not-in-weakened-process we (Let sp E g) =
+not-in-weakened-process we (Let sp E P) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   nin-let sp' (not-in-weakened-term we1 E)
-              (λ v w -> not-in-weakened-process (weaken-next (weaken-next we2)) (g v w))
+              (not-in-weakened-process (weaken-next (weaken-next we2)) P)
 
 strengthen-process :
   ∀{k Γ Δ}
@@ -282,7 +282,7 @@ strengthen-process we (New P) (nin-new ni) =
 strengthen-process we (Rep sc P) (nin-rep _ niP) =
   let _ , we' , sc' = strengthen-scale we sc in
   Rep sc' (strengthen-process we' P niP)
-strengthen-process we (Let sp E g) (nin-let _ niE nig) =
+strengthen-process we (Let sp E P) (nin-let _ niE niP) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
   Let sp' (strengthen-term we1 E niE)
-          (λ v w -> strengthen-process (weaken-next (weaken-next we2)) (g v w) (nig v w))
+          (strengthen-process (weaken-next (weaken-next we2)) P niP)

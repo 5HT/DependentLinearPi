@@ -17,6 +17,7 @@
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; cong; cong₂; sym; subst; subst₂)
+open import Function using (_$_)
 
 open import Data.Empty
 open import Data.Unit
@@ -40,32 +41,31 @@ open import Data.Product
 {- SERVER THAT COMPUTES THE SUCCESSOR OF A NATURAL NUMBER -}
 successor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ))) # _ :: [])
 successor =
-  Rep (scale-c scale1ω scale00 :: [])
-      (Recv (split-c split10 split00 :: [])
-            (var (var-here []))
-            (λ _ -> Let (split-l lin-p :: split-c split00 split00 :: [])
-                        (var (var-here (null-c :: [])))
-                        λ x _ -> Send (split-p :: split-c split00 split10 :: split-p :: split-c split00 split00 :: [])
-                                      (var (var-next null-p (var-here (null-p :: null-c :: []))))
-                                      (pure (null-p :: null-c :: null-p :: null-c :: [])
-                                           (suc x)))
-            )
+  Rep (scale-c scale1ω scale00 :: []) $
+  Recv (split-c split10 split00 :: [])
+       (var (var-here []))
+       λ (x , _) ->
+  Let (split-l lin-p :: split-c split00 split00 :: [])
+      (var (var-here (null-c :: []))) $
+  Send (split-p :: split-c split00 split10 :: split-p :: split-c split00 split00 :: [])
+       (var (var-next null-p (var-here (null-p :: null-c :: []))))
+       (pure (null-p :: null-c :: null-p :: null-c :: []) (suc x))
+
 
 {- SERVER THAT COMPUTES THE PREDECESSOR OF A NON-NULL NATURAL NUMBER -}
 predecessor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Pair (Pure (n ≢ 0)) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ)))) # _ :: [])
 predecessor =
-  Rep (scale-c scale1ω scale00 :: [])
-      (Recv (split-c split10 split00 :: [])
-            (var (var-here []))
-            λ _ ->
-            (Let (split-l lin-p :: split-c split00 split00 :: [])
-                 (var (var-here (null-c :: [])))
-                 λ x _ -> Let (split-p :: split-l lin-p :: split-p :: split-c split00 split00 :: [])
-                            (var (var-next null-p (var-here (null-p :: null-c :: []))))
-                            λ p _ -> Send (split-p :: split-c split00 split10 :: split-p :: split-p :: split-p :: split-c split00 split00 :: [])
-                                        (var (var-next null-p (var-here (null-p :: null-p :: null-p :: null-c :: []))))
-                                        (pure (null-p :: null-c :: null-p :: null-p :: null-p :: null-c :: [])
-                                                   (checked-pred x p))))
+  Rep (scale-c scale1ω scale00 :: []) $
+  Recv (split-c split10 split00 :: [])
+       (var (var-here []))
+       λ (x , p , _) ->
+  Let (split-l lin-p :: split-c split00 split00 :: [])
+      (var (var-here (null-c :: []))) $
+  Let (split-p :: split-l lin-p :: split-p :: split-c split00 split00 :: [])
+      (var (var-next null-p (var-here (null-p :: null-c :: [])))) $
+  Send (split-p :: split-c split00 split10 :: split-p :: split-p :: split-p :: split-c split00 split00 :: [])
+       (var (var-next null-p (var-here (null-p :: null-p :: null-p :: null-c :: []))))
+       (pure (null-p :: null-c :: null-p :: null-p :: null-p :: null-c :: []) (checked-pred x p))
   where
     checked-pred : (x : ℕ) -> x ≢ 0 -> ℕ
     checked-pred zero p = ⊥-elim (p refl)
@@ -117,31 +117,31 @@ recv-data null zero =
 recv-data null (suc n) =
   Recv (split-c split10 split00 :: c-null-split null)
        (var (var-here null))
-       (λ _ ->
-         Let (split-l lin-p :: split-c split00 split00 :: c-null-split null)
-             (var (var-here (null-c :: null)))
-             λ _ _ -> weaken-process (weaken-here null-p)
-                      (recv-data (null-p :: null-c :: null) n))
+       λ _ ->
+  Let (split-l lin-p :: split-c split00 split00 :: c-null-split null)
+      (var (var-here (null-c :: null))) $
+  weaken-process (weaken-here null-p) (recv-data (null-p :: null-c :: null) n)
 
 recv : Process (recv-type # _ :: [])
 recv =
   Recv (split-c split10 split00 :: [])
        (var (var-here []))
-       (λ _ -> Let (split-l lin-p :: split-c split00 split00 :: [])
-                   (var (var-here (null-c :: [])))
-                   λ n _ -> weaken-process (weaken-here null-p)
-                            (recv-data (null-p :: null-c :: []) n))
+       λ (n , _) ->
+  Let (split-l lin-p :: split-c split00 split00 :: [])
+      (var (var-here (null-c :: []))) $
+  weaken-process (weaken-here null-p) (recv-data (null-p :: null-c :: []) n)
 
 {- CERTIFIED ECHO SERVER -}
 
 echo : Process (Chan #ω #0 (fold (Pair (Pure ℕ) (λ x -> Chan #0 #1 (fold (Pair (Pure ℕ) λ y -> Pure (x ≡ y)))))) # _ :: [])
-echo = Rep ((scale-c scale1ω scale00) :: [])
-           (Recv (split-c split10 split00 :: [])
-                 (var (var-here []))
-                 (λ _ -> Let (split-l lin-p :: split-c split00 split00 :: [])
-                             (var (var-here (null-c :: [])))
-                             λ x _ -> Send (split-p :: split-c split00 split10 :: split-p :: split-c split00 split00 :: [])
-                                      (var (var-next null-p (var-here (null-p :: (null-c :: [])))))
-                                      (pair (split-p :: split-c split00 split00 :: split-p :: split-c split00 split00 :: [])
-                                            (pure (null-p :: null-c :: null-p :: null-c :: []) x)
-                                              (pure (null-p :: null-c :: null-p :: null-c :: []) refl))))
+echo = Rep ((scale-c scale1ω scale00) :: []) $
+       Recv (split-c split10 split00 :: [])
+            (var (var-here []))
+            λ (x , _) ->
+       Let (split-l lin-p :: split-c split00 split00 :: [])
+           (var (var-here (null-c :: []))) $
+       Send (split-p :: split-c split00 split10 :: split-p :: split-c split00 split00 :: [])
+            (var (var-next null-p (var-here (null-p :: (null-c :: [])))))
+            (pair (split-p :: split-c split00 split00 :: split-p :: split-c split00 split00 :: [])
+                  (pure (null-p :: null-c :: null-p :: null-c :: []) x)
+                  (pure (null-p :: null-c :: null-p :: null-c :: []) refl))

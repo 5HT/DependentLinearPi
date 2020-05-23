@@ -98,6 +98,6 @@ swap-process sw (New p) = New (swap-process (swap-next sw) p)
 swap-process sw (Rep sc P) =
   let _ , sw' , sc' = swap-scale sw sc in
   Rep sc' (swap-process sw' P)
-swap-process sw (Let sp E f) =
+swap-process sw (Let sp E P) =
   let _ , _ , sp' , sw1 , sw2 = swap-split sw sp in
-  Let sp' (swap-term sw1 E) λ v w → swap-process (swap-next (swap-next sw2)) (f v w)
+  Let sp' (swap-term sw1 E) (swap-process (swap-next (swap-next sw2)) P)

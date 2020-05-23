@@ -102,6 +102,9 @@ not-in-process-null (nin-recv {t = t} sp niE nig) ht =
   let _ , _ , _ , _ , ts , htE , htP = has-type-split ht sp in
   t-null-null-split-null (not-in-term-null niE htE)
                          (not-in-process-null (nig (witness (t .force))) (ht-next htP)) ts
+  -- Applying f to a single witness suffices because the type
+  -- which we want to prove unrestricted is always the same and
+  -- does not depend on the witness
 not-in-process-null (nin-par sp niP niQ) ht =
   let _ , _ , _ , _ , ts , htP , htQ = has-type-split ht sp in
   t-null-null-split-null (not-in-process-null niP htP) (not-in-process-null niQ htQ) ts
@@ -109,10 +112,7 @@ not-in-process-null (nin-new niP) ht = not-in-process-null niP (ht-next ht)
 not-in-process-null (nin-rep sc niP) ht =
   let _ , _ , tsc , ht' = has-type-scale ht sc in
   t-null-scale-null-l (not-in-process-null niP ht') tsc
-not-in-process-null (nin-let {t = t} {f = f} sp niE g) ht =
+not-in-process-null (nin-let {t = t} {f = f} sp niE niP) ht =
   let _ , _ , _ , _ , ts , ht1 , ht2 = has-type-split ht sp in
   t-null-null-split-null (not-in-term-null niE ht1)
-                   (not-in-process-null (g (witness t) (witness (f (witness t)))) (ht-next (ht-next ht2))) ts
-  -- Applying f to a single witness suffices because the type
-  -- which we want to prove unrestricted is always the same and
-  -- does not depend on the witness
+                   (not-in-process-null niP (ht-next (ht-next ht2))) ts
