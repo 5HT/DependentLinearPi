@@ -13,7 +13,7 @@ code, use of [Fira Code](https://github.com/tonsky/FiraCode) is
 recommended as it contains several ligatures that make the Agda code
 much more pleasant to read.
 
-### Primary files
+### Primary modules
 
 * [Multiplicity.agda](DLPi/Multiplicity.agda) Representation of
   **multiplicities** and their properties, including `MScale` and
@@ -30,7 +30,7 @@ much more pleasant to read.
   labelled reduction. Both definitions embed the property that they
   preserve typing.
 
-### Auxiliary files
+### Auxiliary modules
 
 * [Common.agda](DLPi/Common.agda) Some general purpose functions,
   properties and axioms (extensionality). These are very likely to
