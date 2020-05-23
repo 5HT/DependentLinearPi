@@ -36,16 +36,16 @@ open import Scaling
 data PrefixNormalForm : ∀{Γ} -> ℕ -> Multiplicity -> Multiplicity -> Process Γ -> Set where
   pnf-send :
     ∀{k Γ Γ1 Γ2 t v}
-     {x : Var k Γ1 (Chan #0 #1 t) _}
+     {x : Name k Γ1 (Chan #0 #1 t) _}
      {V : Term Γ2 (t .force) v}
     -> (sp : CSplit Γ Γ1 Γ2)
-    -> PrefixNormalForm k #0 #1 (Send sp (var x) V)
+    -> PrefixNormalForm k #0 #1 (Send sp (name x) V)
   pnf-recv :
     ∀{k Γ Γ1 Γ2 t}
-     {x : Var k Γ1 (Chan #1 #0 t) _}
+     {x : Name k Γ1 (Chan #1 #0 t) _}
      {g : (v : ⟦ t .force ⟧) -> Process (t .force # v :: Γ2)}
     -> (sp : CSplit Γ Γ1 Γ2)
-    -> PrefixNormalForm k #1 #0 (Recv sp (var x) g)
+    -> PrefixNormalForm k #1 #0 (Recv sp (name x) g)
   pnf-par :
     ∀{Γ Γ1 Γ2 k m n}{P : Process Γ1}{Q : Process Γ2}
     -> (sp : CSplit Γ Γ1 Γ2)
@@ -62,9 +62,9 @@ prefix-normal-form :
   -> (P : Process Γ)
   -> PrefixedBy k m n P
   -> ∃ λ Q -> P <= Q × PrefixNormalForm k m n Q
-prefix-normal-form (Send _ (var _) _) (prefixed-send sp) =
+prefix-normal-form (Send _ (name _) _) (prefixed-send sp) =
   _ , cong-refl , pnf-send sp
-prefix-normal-form (Recv _ (var _) _) (prefixed-recv sp) =
+prefix-normal-form (Recv _ (name _) _) (prefixed-recv sp) =
   _ , cong-refl , pnf-recv sp
 prefix-normal-form (Par _ P _) (prefixed-par-l sp pb) =
   let _ , pc , pnf = prefix-normal-form P pb in
@@ -86,11 +86,11 @@ weaken-pnf :
   -> (P : Process Γ)
   -> (we : Weaken l Γ Δ)
   -> PrefixNormalForm k m n P
-  -> PrefixNormalForm (weaken-var-index l k) m n (weaken-process we P)
-weaken-pnf (Send sp (var x) E) we (pnf-send _) =
+  -> PrefixNormalForm (weaken-name-index l k) m n (weaken-process we P)
+weaken-pnf (Send sp (name x) E) we (pnf-send _) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   pnf-send sp'
-weaken-pnf (Recv sp (var x) P) we (pnf-recv _) =
+weaken-pnf (Recv sp (name x) P) we (pnf-recv _) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   pnf-recv sp'
 weaken-pnf (Par sp P _) we (pnf-par _ pnf) =

@@ -42,11 +42,11 @@ data ReducibleNormalForm : ∀{Γ} -> ℕ -> Process Γ -> Set where
     -> (sp  : CSplit Γ Γ1 Γ2)
     -> (sp1 : CSplit Γ1 Γ11 Γ12)
     -> (sp2 : CSplit Γ2 Γ21 Γ22)
-    -> (x   : Var k Γ11 (Chan #0 #1 t) _)
-    -> (y   : Var k Γ21 (Chan #1 #0 s) _)
+    -> (x   : Name k Γ11 (Chan #0 #1 t) _)
+    -> (y   : Name k Γ21 (Chan #1 #0 s) _)
     -> (V   : Term Γ12 (t .force) v)
     -> (g   : (v : ⟦ s .force ⟧) -> Process (s .force # v :: Γ22))
-    -> ReducibleNormalForm k (Par sp (Send sp1 (var x) V) (Recv sp2 (var y) g))
+    -> ReducibleNormalForm k (Par sp (Send sp1 (name x) V) (Recv sp2 (name y) g))
   rnf-par :
     ∀{Γ Γ1 Γ2 k}{P : Process Γ1}{Q : Process Γ2}
     -> (sp : CSplit Γ Γ1 Γ2)
@@ -88,7 +88,7 @@ pnf-pnf-rnf :
   -> PrefixNormalForm k #0 #1 P
   -> PrefixNormalForm k #1 #0 Q
   -> ∃ λ R -> Par sp P Q <= R × ReducibleNormalForm k R
-pnf-pnf-rnf sp (Send sp1 (var x) V) (Recv sp2 (var y) R) (pnf-send _) (pnf-recv _) =
+pnf-pnf-rnf sp (Send sp1 (name x) V) (Recv sp2 (name y) R) (pnf-send _) (pnf-recv _) =
   _ , cong-refl , rnf-com sp sp1 sp2 x y V R
 pnf-pnf-rnf sp1 P (Par sp2 Q1 Q2) pnfP@(pnf-send _) (pnf-par _ pnfQ1) =
   let _ , sp1' , sp2' = csplit-assoc-rl sp1 sp2 in
@@ -158,7 +158,7 @@ rnf-reduces :
   -> ∃ λ (cr : Γ == l => Δ)
   -> ∃ λ (Q : Process Δ)
   -> SyncLabel l × P ~~ cr ~> Q
-rnf-reduces (Par sp (Send sp1 (var x) V) (Recv sp2 (var y) P))
+rnf-reduces (Par sp (Send sp1 (name x) V) (Recv sp2 (name y) P))
             (rnf-com _ _ _ _ _ _ _) =
   _ , _ , _ , _ , sync# , r-com sp sp1 sp2 x y V P
 rnf-reduces (Par sp P R) (rnf-par _ pnf) =

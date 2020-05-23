@@ -96,22 +96,22 @@ c-split-scale-scale (ts :: sp) (tsc1 :: sc1) (tsc2 :: sc2) =
   let _ , sc , sp' = c-split-scale-scale sp sc1 sc2 in
   _ , tsc :: sc , ts' :: sp'
 
-scale-var :
+scale-name :
   ∀{k Δ t s v w} ->
   TScale t s v w ->
-  Var k Δ s w ->
-  ∃[ Γ ] (CScale Γ Δ × Var k Γ t v)
-scale-var sc (var-here null) = _ , sc :: c-null-scale null , var-here null
-scale-var sc (var-next tnull x) =
-  let _ , sc' , y = scale-var sc x in
-  _ , t-null-scale tnull :: sc' , var-next tnull y
+  Name k Δ s w ->
+  ∃[ Γ ] (CScale Γ Δ × Name k Γ t v)
+scale-name sc (name-here null) = _ , sc :: c-null-scale null , name-here null
+scale-name sc (name-next tnull x) =
+  let _ , sc' , y = scale-name sc x in
+  _ , t-null-scale tnull :: sc' , name-next tnull y
 
 scale-term :
   ∀{Δ s t v w} ->
   TScale t s v w ->
   Term Δ s w ->
   ∃[ Γ ] (CScale Γ Δ × Term Γ t v)
-scale-term sc (var x) =
-  let _ , sc , x = scale-var sc x in
-  _ , sc , var x
+scale-term sc (name x) =
+  let _ , sc , x = scale-name sc x in
+  _ , sc , name x
 scale-term scale-p (pure null c) = _ , c-null-scale null , pure null c

@@ -34,13 +34,13 @@ open import Scaling
 
 data PrefixedBy : ∀{Γ} -> ℕ -> Multiplicity -> Multiplicity -> Process Γ -> Set where
   prefixed-send :
-    ∀{k Γ Γ1 Γ2 t v}{x : Var k Γ1 (Chan #0 #1 t) _}{V : Term Γ2 (t .force) v}
+    ∀{k Γ Γ1 Γ2 t v}{x : Name k Γ1 (Chan #0 #1 t) _}{V : Term Γ2 (t .force) v}
     -> (sp : CSplit Γ Γ1 Γ2)
-    -> PrefixedBy k #0 #1 (Send sp (var x) V)
+    -> PrefixedBy k #0 #1 (Send sp (name x) V)
   prefixed-recv :
-    ∀{k Γ Γ1 Γ2 t g}{x : Var k Γ1 (Chan #1 #0 t) _}
+    ∀{k Γ Γ1 Γ2 t g}{x : Name k Γ1 (Chan #1 #0 t) _}
     -> (sp : CSplit Γ Γ1 Γ2)
-    -> PrefixedBy k #1 #0 (Recv sp (var x) g)
+    -> PrefixedBy k #1 #0 (Recv sp (name x) g)
   prefixed-par-l :
     ∀{Γ Γ1 Γ2 m n k P Q}
     -> (sp : CSplit Γ Γ1 Γ2)
@@ -65,15 +65,15 @@ swap-prefixed :
   -> (sw : Swap l Γ Δ)
   -> (P : Process Γ)
   -> PrefixedBy k m n P
-  -> PrefixedBy (swap-var-index l k) m n (swap-process sw P)
-swap-prefixed {_} {_} {m} {n} {_} {Δ} sw (Send sp (var x) E) (prefixed-send _) =
+  -> PrefixedBy (swap-name-index l k) m n (swap-process sw P)
+swap-prefixed {_} {_} {m} {n} {_} {Δ} sw (Send sp (name x) E) (prefixed-send _) =
   let _ , _ , sp' , sw1 , sw2 = swap-split sw sp in
-  let x' = swap-var sw1 x in
+  let x' = swap-name sw1 x in
   let E' = swap-term sw2 E in
   prefixed-send sp'
-swap-prefixed {_} {_} {m} {n} sw (Recv sp (var x) P) (prefixed-recv _) =
+swap-prefixed {_} {_} {m} {n} sw (Recv sp (name x) P) (prefixed-recv _) =
   let _ , _ , sp' , sw1 , sw2 = swap-split sw sp in
-  let x' = swap-var sw1 x in
+  let x' = swap-name sw1 x in
   -- let P' = swap-process (swap-next sw2) P in -- TODO: WHAT IS THIS FOR?
   prefixed-recv sp'
 swap-prefixed sw (Par sp P Q) (prefixed-par-l _ pb) =
@@ -96,15 +96,15 @@ weaken-prefixed :
   -> (we : Weaken l Γ Δ)
   -> (P : Process Γ)
   -> PrefixedBy k m n P
-  -> PrefixedBy (weaken-var-index l k) m n (weaken-process we P)
-weaken-prefixed {_} {_} {m} {n} we (Send sp (var x) V) (prefixed-send _) =
+  -> PrefixedBy (weaken-name-index l k) m n (weaken-process we P)
+weaken-prefixed {_} {_} {m} {n} we (Send sp (name x) V) (prefixed-send _) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
-  let x' = weaken-var we1 x in
+  let x' = weaken-name we1 x in
   let V' = weaken-term we2 V in
   prefixed-send {x = x'} {V = V'} sp'
-weaken-prefixed {_} {_} {m} {n} we (Recv sp (var x) P) (prefixed-recv _) =
+weaken-prefixed {_} {_} {m} {n} we (Recv sp (name x) P) (prefixed-recv _) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
-  let x' = weaken-var we1 x in
+  let x' = weaken-name we1 x in
   -- let P' = weaken-process (weaken-next we2) P in -- TODO: WHAT IS THIS FOR?
   prefixed-recv sp'
 weaken-prefixed we (Par sp P Q) (prefixed-par-l _ pb) =
@@ -121,8 +121,8 @@ weaken-prefixed we (Rep sc P) (prefixed-rep pb) =
 
 weaken-not-in-term-neq :
   ∀{k l Γ σ ρ t}
-  -> (x : Var k Γ (Chan σ ρ t) _)
-  -> NotInTerm l (var x)
+  -> (x : Name k Γ (Chan σ ρ t) _)
+  -> NotInTerm l (name x)
   -> l ≢ k
 weaken-not-in-term-neq _ (nin-v nx) = nx
 
@@ -132,9 +132,9 @@ weaken-not-in-process-neq :
   -> NotInProcess l P
   -> PrefixedBy k m n P
   -> l ≢ k
-weaken-not-in-process-neq (Send _ (var x) _) (nin-send _ nie _) (prefixed-send _) =
+weaken-not-in-process-neq (Send _ (name x) _) (nin-send _ nie _) (prefixed-send _) =
   weaken-not-in-term-neq x nie
-weaken-not-in-process-neq (Recv _ (var x) _) (nin-recv _ nie _) (prefixed-recv _) =
+weaken-not-in-process-neq (Recv _ (name x) _) (nin-recv _ nie _) (prefixed-recv _) =
   weaken-not-in-term-neq x nie
 weaken-not-in-process-neq (Par sp P _) (nin-par _ nip _) (prefixed-par-l _ pb) =
   weaken-not-in-process-neq P nip pb
@@ -152,15 +152,15 @@ strengthen-prefixed :
   -> (nip : NotInProcess l P)
   -> (pb : PrefixedBy k m n P)
   -> let neq = weaken-not-in-process-neq P nip pb in
-     PrefixedBy (strengthen-var-index l k neq) m n (strengthen-process we P nip)
-strengthen-prefixed we (Send sp (var x) V) (nin-send _ (nin-v neq) niv) (prefixed-send _) =
+     PrefixedBy (strengthen-name-index l k neq) m n (strengthen-process we P nip)
+strengthen-prefixed we (Send sp (name x) V) (nin-send _ (nin-v neq) niv) (prefixed-send _) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
-  let x' = strengthen-var we1 x neq in
+  let x' = strengthen-name we1 x neq in
   let V' = strengthen-term we2 V niv in
   prefixed-send {x = x'} {V = V'} sp'
-strengthen-prefixed we (Recv sp (var x) P) (nin-recv _ (nin-v neq) nip) (prefixed-recv _) =
+strengthen-prefixed we (Recv sp (name x) P) (nin-recv _ (nin-v neq) nip) (prefixed-recv _) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
-  let x' = strengthen-var we1 x neq in
+  let x' = strengthen-name we1 x neq in
   -- let P' = strengthen-process (weaken-next we2) P nip in -- TODO: WHAT IS THIS FOR?
   prefixed-recv sp'
 strengthen-prefixed we (Par sp P _) (nin-par _ nip _) (prefixed-par-l _ pb) =

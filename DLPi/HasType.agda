@@ -59,16 +59,16 @@ has-type-scale (ht-next ht) (tsc :: sc) =
   let _ , _ , ssc , ht' = has-type-scale ht sc in
   _ , _ , ssc , ht-next ht'
 
-not-in-var-null :
+not-in-name-null :
   ∀{k l Γ t s v w}
-  -> Var k Γ s w
+  -> Name k Γ s w
   -> l ≢ k
   -> Lookup l Γ t v
   -> TNull t
-not-in-var-null (var-here _) nx ht-here = ⊥-elim (nx refl)
-not-in-var-null (var-here cz) _ (ht-next ht) = has-type-null ht cz
-not-in-var-null (var-next tnull _) _ ht-here = tnull
-not-in-var-null (var-next _ x) nx (ht-next ht) = not-in-var-null x (suc-≢ nx) ht
+not-in-name-null (name-here _) nx ht-here = ⊥-elim (nx refl)
+not-in-name-null (name-here cz) _ (ht-next ht) = has-type-null ht cz
+not-in-name-null (name-next tnull _) _ ht-here = tnull
+not-in-name-null (name-next _ x) nx (ht-next ht) = not-in-name-null x (suc-≢ nx) ht
 
 not-in-term-null :
   ∀{k Γ t s v w}
@@ -76,7 +76,7 @@ not-in-term-null :
   -> NotInTerm k V
   -> Lookup k Γ t v
   -> TNull t
-not-in-term-null (nin-v {x = x} nx) ht = not-in-var-null x nx ht
+not-in-term-null (nin-v {x = x} nx) ht = not-in-name-null x nx ht
 not-in-term-null (nin-n cnull _) ht = has-type-null ht cnull
 not-in-term-null (nin-p sp nie1 nie2) ht =
   let _ , _ , _ , _ , ts , ht1 , ht2 = has-type-split ht sp in

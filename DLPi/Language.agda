@@ -26,22 +26,22 @@ open import Context
 
 module Language where
 
-data Var : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
-  var-here : ∀{Γ t v} -> CNull Γ -> Var zero (t # v :: Γ) t v
-  var-next : ∀{k Γ t v s w} -> TNull s -> Var k Γ t v -> Var (suc k) (s # w :: Γ) t v
+data Name : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
+  name-here : ∀{Γ t p} -> CNull Γ -> Name zero (t # p :: Γ) t p
+  name-next : ∀{k Γ t s p q} -> TNull s -> Name k Γ t p -> Name (suc k) (s # q :: Γ) t p
 
 data Term : Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
-  var  : ∀{k Γ t v} -> Var k Γ t v -> Term Γ t v
-  pure : ∀{Γ A} -> CNull Γ -> (v : A) -> Term Γ (Pure A) v
-  pair : ∀{Γ Γ1 Γ2 t f v w} -> CSplit Γ Γ1 Γ2 -> Term Γ1 t v -> Term Γ2 (f v) w -> Term Γ (Pair t f) (v , w)
+  name : ∀{k Γ t p} -> Name k Γ t p -> Term Γ t p
+  pure : ∀{Γ A} -> CNull Γ -> (p : A) -> Term Γ (Pure A) p
+  pair : ∀{Γ Γ1 Γ2 t f p q} -> CSplit Γ Γ1 Γ2 -> Term Γ1 t p -> Term Γ2 (f p) q -> Term Γ (Pair t f) (p , q)
 
 data Process : Context -> Set₁ where
   Idle : ∀{Γ} -> CNull Γ -> Process Γ
   Send :
-    ∀{Γ Γ1 Γ2 t v} ->
+    ∀{Γ Γ1 Γ2 t p} ->
     CSplit Γ Γ1 Γ2 ->
     Term Γ1 (Chan #0 #1 t) _ ->
-    Term Γ2 (t .force) v ->
+    Term Γ2 (t .force) p ->
     Process Γ
   Recv :
     ∀{Γ Γ1 Γ2 t} ->

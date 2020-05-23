@@ -205,21 +205,21 @@ m-split-split-r sp1 sp2 =
 
 !-reduction :
   ∀{k Γ t}
-  -> Var k Γ (Chan #0 #1 t) _
+  -> Name k Γ (Chan #0 #1 t) _
   -> ∃[ Δ ] ((Γ == L! k => Δ) × CNull Δ)
-!-reduction {_} {_ # _ :: Γ} {t} (var-here cz) =
+!-reduction {_} {_ # _ :: Γ} {t} (name-here cz) =
   (Chan #0 #0 t # _ :: Γ) , !-here split10 , null-c :: cz
-!-reduction {_} {s # _ :: _} (var-next sz x) =
+!-reduction {_} {s # _ :: _} (name-next sz x) =
   let Δ , cout , cz = !-reduction x in
   (s # _ :: Δ) , !-next cout , sz :: cz
 
 ?-reduction :
   ∀{k Γ t}
-  -> Var k Γ (Chan #1 #0 t) _
+  -> Name k Γ (Chan #1 #0 t) _
   -> ∃[ Δ ] ((Γ == L? k => Δ) × CNull Δ)
-?-reduction {_} {_ # _ :: Γ} {t} (var-here cz) =
+?-reduction {_} {_ # _ :: Γ} {t} (name-here cz) =
   (Chan #0 #0 t # _ :: Γ) , ?-here split10 , null-c :: cz
-?-reduction {_} {s # _ :: _} (var-next sz x) =
+?-reduction {_} {s # _ :: _} (name-next sz x) =
   let Δ , cinp , cz = ?-reduction x in
   (s # _ :: Δ) , ?-next cinp , sz :: cz
 
@@ -276,27 +276,27 @@ csplit-type-eq :
   -> CSplit Γ Γ1 Γ2
   -> CSplit Γ1 Γ11 Γ12
   -> CSplit Γ2 Γ21 Γ22
-  -> Var k Γ11 (Chan m1 n1 t) _
-  -> Var k Γ21 (Chan m2 n2 s) _
+  -> Name k Γ11 (Chan m1 n1 t) _
+  -> Name k Γ21 (Chan m2 n2 s) _
   -> t ≡ s
 csplit-type-eq (ts :: _)
                (ts1 :: _)
                (ts2 :: _)
-               (var-here _)
-               (var-here _) = tsplit-type-eq ts ts1 ts2
+               (name-here _)
+               (name-here _) = tsplit-type-eq ts ts1 ts2
 csplit-type-eq (_ :: sp)
                (_ :: sp1)
                (_ :: sp2)
-               (var-next _ x)
-               (var-next _ y) = csplit-type-eq sp sp1 sp2 x y
+               (name-next _ x)
+               (name-next _ y) = csplit-type-eq sp sp1 sp2 x y
 
 sync :
   ∀{k Γ Γ1 Γ2 Γ11 Γ12 Γ21 Γ22 t s} ->
   CSplit Γ Γ1 Γ2 ->
   CSplit Γ1 Γ11 Γ12 ->
   CSplit Γ2 Γ21 Γ22 ->
-  Var k Γ11 (Chan #0 #1 t) _ ->
-  Var k Γ21 (Chan #1 #0 s) _ ->
+  Name k Γ11 (Chan #0 #1 t) _ ->
+  Name k Γ21 (Chan #1 #0 s) _ ->
   ∃[ Δ ] ((Γ == L# k => Δ) × CSplit Δ Γ12 Γ22)
 sync {_} {_} {Γ1} {Γ2} {_} {Γ12} {_} {Γ22} sp sp1 sp2 x y =
   let Δ11 , ocr , cz1 = !-reduction x in
@@ -325,20 +325,20 @@ cast-term refl E = E
 
 data _~~_~>_ : ∀{l Γ Δ} -> Process Γ -> (Γ == l => Δ) -> Process Δ -> Set₁ where
   r-com :
-    ∀{k Γ Γ1 Γ2 Γ11 Γ12 Γ21 Γ22 t s v}
+    ∀{k Γ Γ1 Γ2 Γ11 Γ12 Γ21 Γ22 t s p}
     (sp  : CSplit Γ Γ1 Γ2)
     (sp1 : CSplit Γ1 Γ11 Γ12)
     (sp2 : CSplit Γ2 Γ21 Γ22)
-    (x   : Var k Γ11 (Chan #0 #1 t) _)
-    (y   : Var k Γ21 (Chan #1 #0 s) _)
-    (M   : Term Γ12 (t .force) v)
+    (x   : Name k Γ11 (Chan #0 #1 t) _)
+    (y   : Name k Γ21 (Chan #1 #0 s) _)
+    (M   : Term Γ12 (t .force) p)
     (F   : (w : ⟦ s .force ⟧) -> Process (s .force # w :: Γ22)) ->
     let _ , α , sp' = sync sp sp1 sp2 x y in
     let teq = csplit-type-eq sp sp1 sp2 x y in
     let N = cast-term (cong (λ p -> p .force) teq) M in
-    Par sp (Send sp1 (var x) M) (Recv sp2 (var y) F)
+    Par sp (Send sp1 (name x) M) (Recv sp2 (name y) F)
     ~~ α ~>
-    subst-process sp' N insert-here (F (cast-pure (cong (λ p -> p .force) teq) v))
+    subst-process sp' N insert-here (F (cast-pure (cong (λ p -> p .force) teq) p))
   r-let :
     ∀{Γ Γ1 Γ2 Γ11 Γ12 t}
     (f   : ⟦ t ⟧ -> Type)

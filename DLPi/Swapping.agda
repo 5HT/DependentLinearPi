@@ -39,19 +39,19 @@ swap-null : ∀{n Γ Δ} -> Swap n Γ Δ -> CNull Γ -> CNull Δ
 swap-null swap-here (tz :: sz :: cz) = sz :: tz :: cz
 swap-null (swap-next sw) (tz :: cz) = tz :: swap-null sw cz
 
-swap-var-index : ℕ -> ℕ -> ℕ
-swap-var-index zero zero = suc zero
-swap-var-index zero (suc zero) = zero
-swap-var-index zero (suc (suc k)) = suc (suc k)
-swap-var-index (suc n) zero = zero
-swap-var-index (suc n) (suc k) = suc (swap-var-index n k)
+swap-name-index : ℕ -> ℕ -> ℕ
+swap-name-index zero zero = suc zero
+swap-name-index zero (suc zero) = zero
+swap-name-index zero (suc (suc k)) = suc (suc k)
+swap-name-index (suc n) zero = zero
+swap-name-index (suc n) (suc k) = suc (swap-name-index n k)
 
-swap-var : ∀{k n Γ Δ t v} -> Swap n Γ Δ -> Var k Γ t v -> Var (swap-var-index n k) Δ t v
-swap-var swap-here (var-here (sz :: cz)) = var-next sz (var-here cz)
-swap-var swap-here (var-next tz (var-here cz)) = var-here (tz :: cz)
-swap-var swap-here (var-next tz (var-next sz x)) = var-next sz (var-next tz x)
-swap-var (swap-next sw) (var-here cz) = var-here (swap-null sw cz)
-swap-var (swap-next sw) (var-next tu x) = var-next tu (swap-var sw x)
+swap-name : ∀{k n Γ Δ t v} -> Swap n Γ Δ -> Name k Γ t v -> Name (swap-name-index n k) Δ t v
+swap-name swap-here (name-here (sz :: cz)) = name-next sz (name-here cz)
+swap-name swap-here (name-next tz (name-here cz)) = name-here (tz :: cz)
+swap-name swap-here (name-next tz (name-next sz x)) = name-next sz (name-next tz x)
+swap-name (swap-next sw) (name-here cz) = name-here (swap-null sw cz)
+swap-name (swap-next sw) (name-next tu x) = name-next tu (swap-name sw x)
 
 swap-split :
   ∀{n Γ Γ1 Γ2 Δ}
@@ -65,7 +65,7 @@ swap-split (swap-next sw) (ts :: sp) =
   _ , _ , ts :: sp , swap-next sw1 , swap-next sw2
 
 swap-term : ∀{n Γ Δ t v} -> Swap n Γ Δ -> Term Γ t v -> Term Δ t v
-swap-term sw (var x) = var (swap-var sw x)
+swap-term sw (name x) = name (swap-name sw x)
 swap-term sw (pure cnull c) = pure (swap-null sw cnull) c
 swap-term sw (pair sp E1 E2) =
   let _ , _ , sp' , sw1 , sw2 = swap-split sw sp in

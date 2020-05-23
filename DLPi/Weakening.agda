@@ -107,39 +107,39 @@ strengthen-scale (weaken-next we) (tsc :: sc) =
   let _ , we' , sc' = strengthen-scale we sc in
   _ , weaken-next we' , tsc :: sc'
 
-{- VARIABLES -}
+{- NAMEIABLES -}
 
-weaken-var-index : ℕ -> ℕ -> ℕ
-weaken-var-index zero k = suc k
-weaken-var-index (suc n) zero = zero
-weaken-var-index (suc n) (suc k) = suc (weaken-var-index n k)
+weaken-name-index : ℕ -> ℕ -> ℕ
+weaken-name-index zero k = suc k
+weaken-name-index (suc n) zero = zero
+weaken-name-index (suc n) (suc k) = suc (weaken-name-index n k)
 
-weaken-var : ∀{n k Γ Δ t v} -> Weaken n Γ Δ -> Var k Γ t v -> Var (weaken-var-index n k) Δ t v
-weaken-var (weaken-here tnull) x = var-next tnull x
-weaken-var (weaken-next we) (var-here null) = var-here (weaken-null we null)
-weaken-var (weaken-next we) (var-next tnull x) = var-next tnull (weaken-var we x)
+weaken-name : ∀{n k Γ Δ t v} -> Weaken n Γ Δ -> Name k Γ t v -> Name (weaken-name-index n k) Δ t v
+weaken-name (weaken-here tnull) x = name-next tnull x
+weaken-name (weaken-next we) (name-here null) = name-here (weaken-null we null)
+weaken-name (weaken-next we) (name-next tnull x) = name-next tnull (weaken-name we x)
 
-not-in-weakened-var : ∀{k n Γ Δ t v} -> Weaken n Γ Δ -> Var k Γ t v -> n ≢ weaken-var-index n k
-not-in-weakened-var (weaken-here _) _ = zero-not-suc
-not-in-weakened-var (weaken-next _) (var-here _) = suc-not-zero
-not-in-weakened-var (weaken-next we) (var-next _ x) = ≢-suc (not-in-weakened-var we x)
+not-in-weakened-name : ∀{k n Γ Δ t v} -> Weaken n Γ Δ -> Name k Γ t v -> n ≢ weaken-name-index n k
+not-in-weakened-name (weaken-here _) _ = zero-not-suc
+not-in-weakened-name (weaken-next _) (name-here _) = suc-not-zero
+not-in-weakened-name (weaken-next we) (name-next _ x) = ≢-suc (not-in-weakened-name we x)
 
-strengthen-var-index : (l : ℕ) -> (k : ℕ) -> l ≢ k -> ℕ
-strengthen-var-index zero zero neq = ⊥-elim (neq refl)
-strengthen-var-index zero (suc k) _ = k
-strengthen-var-index (suc l) zero _ = zero
-strengthen-var-index (suc l) (suc k) neq = suc (strengthen-var-index l k (suc-≢ neq))
+strengthen-name-index : (l : ℕ) -> (k : ℕ) -> l ≢ k -> ℕ
+strengthen-name-index zero zero neq = ⊥-elim (neq refl)
+strengthen-name-index zero (suc k) _ = k
+strengthen-name-index (suc l) zero _ = zero
+strengthen-name-index (suc l) (suc k) neq = suc (strengthen-name-index l k (suc-≢ neq))
 
-strengthen-var : ∀{k n Γ Δ t v} -> Weaken n Γ Δ -> Var k Δ t v -> (neq : n ≢ k) -> Var (strengthen-var-index n k neq) Γ t v
-strengthen-var (weaken-here _) (var-here _) neq = ⊥-elim (neq refl)
-strengthen-var (weaken-here _) (var-next _ x) _ = x
-strengthen-var (weaken-next we) (var-here cnull) _ = var-here (strengthen-null we cnull)
-strengthen-var (weaken-next we) (var-next tu x) neq = var-next tu (strengthen-var we x (suc-≢ neq))
+strengthen-name : ∀{k n Γ Δ t v} -> Weaken n Γ Δ -> Name k Δ t v -> (neq : n ≢ k) -> Name (strengthen-name-index n k neq) Γ t v
+strengthen-name (weaken-here _) (name-here _) neq = ⊥-elim (neq refl)
+strengthen-name (weaken-here _) (name-next _ x) _ = x
+strengthen-name (weaken-next we) (name-here cnull) _ = name-here (strengthen-null we cnull)
+strengthen-name (weaken-next we) (name-next tu x) neq = name-next tu (strengthen-name we x (suc-≢ neq))
 
 {- VALUES -}
 
 data NotInTerm : ∀{Γ t v} -> ℕ -> Term Γ t v -> Set₁ where
-  nin-v : ∀{Γ t v k n}{x : Var k Γ t v} -> n ≢ k -> NotInTerm n (var x)
+  nin-v : ∀{Γ t v k n}{x : Name k Γ t v} -> n ≢ k -> NotInTerm n (name x)
   nin-n : ∀{Γ A n} -> (cnull : CNull Γ) -> (c : A) -> NotInTerm n (pure cnull c)
   nin-p :
     ∀{Γ Γ1 Γ2 n}{t : Type}{f : ⟦ t ⟧ -> Type}{v w}
@@ -151,14 +151,14 @@ data NotInTerm : ∀{Γ t v} -> ℕ -> Term Γ t v -> Set₁ where
      -> NotInTerm n (pair {f = f} sp V1 V2)
 
 weaken-term : ∀{n Γ Δ t v} -> Weaken n Γ Δ -> Term Γ t v -> Term Δ t v
-weaken-term we (var x) = var (weaken-var we x)
+weaken-term we (name x) = name (weaken-name we x)
 weaken-term we (pure cnull c) = pure (weaken-null we cnull) c
 weaken-term we (pair sp E1 E2) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   pair sp' (weaken-term we1 E1) (weaken-term we2 E2)
 
 strengthen-term : ∀{n Γ Δ t v} -> Weaken n Γ Δ -> (V : Term Δ t v) -> NotInTerm n V -> Term Γ t v
-strengthen-term we (var x) (nin-v neq) = var (strengthen-var we x neq)
+strengthen-term we (name x) (nin-v neq) = name (strengthen-name we x neq)
 strengthen-term we (pure cnull c) ni = pure (strengthen-null we cnull) c
 strengthen-term we (pair sp E1 E2) (nin-p _ nie1 nie2) =
   let _ , _ , sp' , we1 , we2 = strengthen-split we sp in
@@ -169,7 +169,7 @@ not-in-weakened-term :
   -> (we : Weaken n Γ Δ)
   -> (V : Term Γ t v)
   -> NotInTerm n (weaken-term we V)
-not-in-weakened-term we (var x) = nin-v (not-in-weakened-var we x)
+not-in-weakened-term we (name x) = nin-v (not-in-weakened-name we x)
 not-in-weakened-term we (pure cnull c) = nin-n (weaken-null we cnull) c
 not-in-weakened-term we (pair sp E1 E2) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in

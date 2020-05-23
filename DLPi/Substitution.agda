@@ -59,30 +59,30 @@ insert-null-null-null (insert-next ins) (sz :: cnull) =
   let tz , cnull' = insert-null-null-null ins cnull in
   tz , sz :: cnull'
 
-var-null-null : ∀{k Γ t v} -> Var k Γ t v -> TNull t -> CNull Γ
-var-null-null (var-here cnull) tz = tz :: cnull
-var-null-null (var-next sz x) tz = sz :: var-null-null x tz
+name-null-null : ∀{k Γ t v} -> Name k Γ t v -> TNull t -> CNull Γ
+name-null-null (name-here cnull) tz = tz :: cnull
+name-null-null (name-next sz x) tz = sz :: name-null-null x tz
 
 term-null-null : ∀{Γ t v} -> Term Γ t v -> TNull t -> CNull Γ
-term-null-null (var x) tnull = var-null-null x tnull
+term-null-null (name x) tnull = name-null-null x tnull
 term-null-null (pure null _) null-p = null
 
-split-var : ∀{k Γ t t1 t2 v v1 v2}
+split-name : ∀{k Γ t t1 t2 v v1 v2}
   -> TSplit t t1 t2 v v1 v2
-  -> Var k Γ t v
-  -> ∃[ Γ1 ] ∃[ Γ2 ] (CSplit Γ Γ1 Γ2 × Var k Γ1 t1 v1 × Var k Γ2 t2 v2)
-split-var tsp (var-here null) = _ , _ , tsp :: (c-null-split null) , var-here null , var-here null
-split-var tsp (var-next snull x) =
-  let _ , _ , sp , x1 , x2 = split-var tsp x in
-  _ , _ , t-null-split snull :: sp , var-next snull x1 , var-next snull x2
+  -> Name k Γ t v
+  -> ∃[ Γ1 ] ∃[ Γ2 ] (CSplit Γ Γ1 Γ2 × Name k Γ1 t1 v1 × Name k Γ2 t2 v2)
+split-name tsp (name-here null) = _ , _ , tsp :: (c-null-split null) , name-here null , name-here null
+split-name tsp (name-next snull x) =
+  let _ , _ , sp , x1 , x2 = split-name tsp x in
+  _ , _ , t-null-split snull :: sp , name-next snull x1 , name-next snull x2
 
 split-term :
   ∀{Γ t t1 t2 v v1 v2} ->
   TSplit t t1 t2 v v1 v2 ->
   Term Γ t v ->
   ∃[ Γ1 ] ∃[ Γ2 ] (CSplit Γ Γ1 Γ2 × Term Γ1 t1 v1 × Term Γ2 t2 v2)
-split-term sp (var x) with split-var sp x
-... | _ , _ , csp , x1 , x2 = _ , _ , csp , var x1 , var x2
+split-term sp (name x) with split-name sp x
+... | _ , _ , csp , x1 , x2 = _ , _ , csp , name x1 , name x2
 split-term split-p E@(pure null c) =
   _ , _ , c-null-split null , E , E
 split-term {Γ} (split-l lin) E =
@@ -155,21 +155,21 @@ c-split-null-eq-r sp cnull = c-split-null-eq-l (csplit-comm sp) cnull
 
 data SubstitutionResult : (t : Type) -> ⟦ t ⟧ -> Context -> Context -> (s : Type) -> ⟦ s ⟧ -> Set₁ where
   found : ∀{t v Γ Δ} -> CNull Γ -> SubstitutionResult t v Γ Δ t v
-  not-found : ∀{k t v Γ Δ s w} -> TNull t -> Var k Γ s w -> SubstitutionResult t v Γ Δ s w
+  not-found : ∀{k t v Γ Δ s w} -> TNull t -> Name k Γ s w -> SubstitutionResult t v Γ Δ s w
 
 subst-result :
   ∀{Γ Δ k l t s v w}
   -> Insert l t v Γ Δ
-  -> Var k Δ s w
+  -> Name k Δ s w
   -> SubstitutionResult t v Γ Δ s w
-subst-result insert-here (var-here cnull) = found cnull
-subst-result insert-here (var-next tz x) = not-found tz x
-subst-result (insert-next ins) (var-here cnull) =
+subst-result insert-here (name-here cnull) = found cnull
+subst-result insert-here (name-next tz x) = not-found tz x
+subst-result (insert-next ins) (name-here cnull) =
   let tz , cnull = insert-null-null-null ins cnull in
-  not-found tz (var-here cnull)
-subst-result (insert-next ins) (var-next sz x) with subst-result ins x
+  not-found tz (name-here cnull)
+subst-result (insert-next ins) (name-next sz x) with subst-result ins x
 ... | found cnull = found (sz :: cnull)
-... | not-found tu y = not-found tu (var-next sz y)
+... | not-found tu y = not-found tu (name-next sz y)
 
 insert-null-weaken : ∀{k Γ Δ t v} -> TNull t -> Insert k t v Γ Δ -> Weaken k Γ Δ
 insert-null-weaken tz insert-here = weaken-here tz
@@ -185,19 +185,19 @@ insert-scale (insert-next ins) (ssc :: sc) =
   let _ , _ , _ , ins' , tsc , sc' = insert-scale ins sc in
   _ , _ , _ , insert-next ins' , tsc , ssc :: sc'
 
-subst-var :
+subst-name :
   ∀{Γ Δ Γ1 Γ2 k l t s v w}
   -> CSplit Γ Γ1 Γ2
   -> Term Γ1 t v
   -> Insert l t v Γ2 Δ
-  -> Var k Δ s w
+  -> Name k Δ s w
   -> Term Γ s w
-subst-var sp V ins x with subst-result ins x
+subst-name sp V ins x with subst-result ins x
 ... | found cnull rewrite c-split-null-eq-l sp cnull = V
 ... | not-found tz y =
   let we = insert-null-weaken tz ins in
   let cnull = term-null-null V tz in
-  subst (λ Γ' -> Term Γ' _ _) (sym (c-split-null-eq-r sp cnull)) (var y)
+  subst (λ Γ' -> Term Γ' _ _) (sym (c-split-null-eq-r sp cnull)) (name y)
 
 subst-term :
   ∀{Γ Δ Γ1 Γ2 k t s v w} ->
@@ -206,7 +206,7 @@ subst-term :
   Insert k t v Γ2 Δ ->
   Term Δ s w ->
   Term Γ s w
-subst-term sp E ins (var x) = subst-var sp E ins x
+subst-term sp E ins (name x) = subst-name sp E ins x
 subst-term sp V ins (pure cnull c) =
   let tnull , cnull' = insert-null-null-null ins cnull in
   pure (c-null-null-split-null (term-null-null V tnull) cnull' sp) c
