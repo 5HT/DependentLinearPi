@@ -51,7 +51,7 @@ Type : Set₁
 Type = PreType ∞
 
 data Linear : Type -> Set where
-  lin-p : ∀{t s} -> Linear (Pair t s)
+  pair : ∀{t s} -> Linear (Pair t s)
 
 data TNull : Type -> Set₁ where
   null-p : ∀{A} -> TNull (Pure A)
@@ -90,7 +90,7 @@ tsplit-comm-inv (split-c σs ρs) = cong₂ split-c (msplit-comm-inv σs) (mspli
 tsplit-l : ∀(t : Type){v} -> ∃[ s ] ∃[ w ] (TNull s × TSplit t t s v v w)
 tsplit-l (Pure _) = _ , _ , null-p , split-p
 tsplit-l (Chan σ ρ t) = _ , _ , null-c , split-c (msplit-l σ) (msplit-l ρ)
-tsplit-l (Pair _ _) = _ , _ , null-p , split-l lin-p
+tsplit-l (Pair _ _) = _ , _ , null-p , split-l pair
 
 tsplit-r : ∀(t : Type){v} -> ∃[ s ] ∃[ w ] (TNull s × TSplit t s t v w v)
 tsplit-r t =

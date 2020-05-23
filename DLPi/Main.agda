@@ -45,7 +45,7 @@ successor =
   Recv (split-c split10 split00 :: [])
        (name (here []))
        λ (x , _) ->
-  Let (split-l lin-p :: split-c split00 split00 :: [])
+  Let (split-l pair :: split-c split00 split00 :: [])
       (name (here (null-c :: []))) $
   Send (split-p :: split-c split00 split10 :: split-p :: split-c split00 split00 :: [])
        (name (next null-p (here (null-p :: null-c :: []))))
@@ -59,9 +59,9 @@ predecessor =
   Recv (split-c split10 split00 :: [])
        (name (here []))
        λ (x , p , _) ->
-  Let (split-l lin-p :: split-c split00 split00 :: [])
+  Let (split-l pair :: split-c split00 split00 :: [])
       (name (here (null-c :: []))) $
-  Let (split-p :: split-l lin-p :: split-p :: split-c split00 split00 :: [])
+  Let (split-p :: split-l pair :: split-p :: split-c split00 split00 :: [])
       (name (next null-p (here (null-p :: null-c :: [])))) $
   Send (split-p :: split-c split00 split10 :: split-p :: split-p :: split-p :: split-c split00 split00 :: [])
        (name (next null-p (here (null-p :: null-p :: null-p :: null-c :: []))))
@@ -118,7 +118,7 @@ recv-data null (suc n) =
   Recv (split-c split10 split00 :: c-null-split null)
        (name (here null))
        λ _ ->
-  Let (split-l lin-p :: split-c split00 split00 :: c-null-split null)
+  Let (split-l pair :: split-c split00 split00 :: c-null-split null)
       (name (here (null-c :: null))) $
   weaken-process (here null-p) (recv-data (null-p :: null-c :: null) n)
 
@@ -127,7 +127,7 @@ recv =
   Recv (split-c split10 split00 :: [])
        (name (here []))
        λ (n , _) ->
-  Let (split-l lin-p :: split-c split00 split00 :: [])
+  Let (split-l pair :: split-c split00 split00 :: [])
       (name (here (null-c :: []))) $
   weaken-process (here null-p) (recv-data (null-p :: null-c :: []) n)
 
@@ -138,7 +138,7 @@ echo = Rep ((scale-c scale1ω scale00) :: []) $
        Recv (split-c split10 split00 :: [])
             (name (here []))
             λ (x , _) ->
-       Let (split-l lin-p :: split-c split00 split00 :: [])
+       Let (split-l pair :: split-c split00 split00 :: [])
            (name (here (null-c :: []))) $
        Send (split-p :: split-c split00 split10 :: split-p :: split-c split00 split00 :: [])
             (name (next null-p (here (null-p :: (null-c :: [])))))
