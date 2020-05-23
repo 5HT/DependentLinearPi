@@ -28,7 +28,7 @@ open import Common
 open import Multiplicity
 open import Type
 open import Context
-open import Language
+open import Syntax
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; subst; cong; cong₂; sym)

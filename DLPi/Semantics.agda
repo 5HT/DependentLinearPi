@@ -26,7 +26,7 @@ open import Common
 open import Multiplicity
 open import Type
 open import Context
-open import Language
+open import Syntax
 open import Swapping
 open import Weakening
 open import Substitution

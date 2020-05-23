@@ -26,7 +26,7 @@ open import Codata.Thunk
 open import Multiplicity
 open import Type
 open import Context
-open import Language
+open import Syntax
 open import Multiplicity
 open import Type
 open import Context

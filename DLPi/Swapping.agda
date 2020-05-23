@@ -25,7 +25,7 @@ open Eq using (_≡_; _≢_; refl; subst; cong; cong₂; sym)
 open import Multiplicity
 open import Type
 open import Context
-open import Language
+open import Syntax
 
 data Swap : ℕ -> Context -> Context -> Set where
   here : ∀{Γ t s v w} -> Swap zero (t # v :: (s # w :: Γ)) (s # w :: (t # v :: Γ))

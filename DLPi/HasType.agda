@@ -30,14 +30,14 @@ open import Common
 open import Multiplicity
 open import Type
 open import Context
-open import Language
+open import Syntax
 open import Weakening
 
 has-type-split :
-  ∀{Γ Γ1 Γ2 k t v}
-  -> Lookup k Γ t v
-  -> CSplit Γ Γ1 Γ2
-  -> ∃[ t1 ] ∃[ t2 ] ∃[ v1 ] ∃[ v2 ] (TSplit t t1 t2 v v1 v2 × Lookup k Γ1 t1 v1 × Lookup k Γ2 t2 v2)
+  ∀{Γ Γ1 Γ2 k t v} ->
+  Lookup k Γ t v ->
+  CSplit Γ Γ1 Γ2 ->
+  ∃[ t1 ] ∃[ t2 ] ∃[ v1 ] ∃[ v2 ] (TSplit t t1 t2 v v1 v2 × Lookup k Γ1 t1 v1 × Lookup k Γ2 t2 v2)
 has-type-split here (ts :: _) =
   _ , _ , _ , _ , ts , here , here
 has-type-split (next ht) (_ :: sp) =

@@ -7,27 +7,41 @@ exchanged messages.
 
 ## DLPi
 
-This folder contains the full formalization of DLπ. Here is an
-outline of the files and of their purpose:
+This folder contains the full formalization of DLπ. Below is an
+outline of the files and of their purpose. While looking at the
+code, use of [Fira Code](https://github.com/tonsky/FiraCode) is
+recommended as it contains several ligatures that make the Agda code
+much more pleasant to read.
+
+### Primary files
+
+* [Multiplicity.agda](DLPi/Multiplicity.agda) Representation of
+  **multiplicities** and their properties, including `MScale` and
+  `MSplit`.
+* [Type.agda](DLPi/Type.agda) Definition of DLπ **types** and their
+  properties, including `TNull`, `TScale` and `TSplit`.
+* [Context.agda](DLPi/Context.agda) Definition of **contexts** and
+  related properties, including `CNull`, `CScale` and `CSplit`.
+* [Syntax.agda](DLPi/Syntax.agda) Data types for representing
+  **terms** and **processes**. Look no further if you're looking for
+  `Name`, `Term` and `Process`.
+* [Semantics.agda](DLPi/Semantics.agda) The **operational
+  semantics** of DLπ, including structural pre-congruence and
+  labelled reduction. Both definitions embed the property that they
+  preserve typing.
+
+### Auxiliary files
 
 * [Common.agda](DLPi/Common.agda) Some general purpose functions,
   properties and axioms (extensionality). These are very likely to
   be found somewhere in the standard library, but so far we've been
   too lazy to look them up.
-* [Context.agda](DLPi/Context.agda) Definition of **contexts** and
-  related properties, including `CNull`, `CScale` and `CSplit`.
 * [HasType.agda](DLPi/HasType.agda) Proof that a name not occurring
   in a well-typed process has a type that satisfies `TNull`, hence
   it is unrestricted.
-* [Language.agda](DLPi/Language.agda) Data types for representing
-  **terms** and **processes**. Look no further if you want to see
-  `Var`, `Term` and `Process`.
 * [Main.agda](DLPi/Main.agda) Container for a few **examples**, but
-  mostly useful as root file that requires the type checking of
+  mostly useful as root file that triggers the type checking of
   everything.
-* [Multiplicity.agda](DLPi/Multiplicity.agda) Representation of
-  **multiplicities** and their properties, including `MScale` and
-  `MSplit`.
 * [PrefixNormalForm.agda](DLPi/PrefixNormalForm.agda) Proof that
   every process can be rewritten in prefix-normal-form using
   structural pre-congruence.
@@ -38,23 +52,12 @@ outline of the files and of their purpose:
   given channel can be rewritten in reducible normal form using
   structural pre-congruence. In this normal form, the two prefixes
   sit next to each other, so the process is ready to reduce.
-* [Semantics.agda](DLPi/Semantics.agda) The **operational
-  semantics** of DLπ, including structural pre-congruence and
-  labelled reduction. Both definitions embed the property that they
-  preserve typing.
 * [Substitution.agda](DLPi/Substitution.agda) **Substitution** of
   terms for variables in processes.
 * [Swapping.agda](DLPi/Swapping.agda) Some auxiliary properties
   about swapping names in a context.
-* [Type.agda](DLPi/Type.agda) Definition of DLπ **types** and their
-  properties, including `TNull`, `TScale` and `TSplit`.
 * [Weakening.agda](DLPi/Weakening.agda) Definition of `Weaken` and
   weakening properties for terms and processes.
-
-While reading the code, use of [Fira
-Code](https://github.com/tonsky/FiraCode) is recommended as it
-contains several ligatures that make the Agda code more pleasant to
-read.
 
 ## SessionTypes
 

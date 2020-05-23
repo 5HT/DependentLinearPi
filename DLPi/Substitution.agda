@@ -30,7 +30,7 @@ open import Common
 open import Multiplicity
 open import Type
 open import Context
-open import Language
+open import Syntax
 open import Weakening
 
 data Insert : ℕ -> (t : Type) -> ⟦ t ⟧ -> Context -> Context -> Set where

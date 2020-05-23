@@ -24,7 +24,7 @@ open import Multiplicity
 open import Type
 open import Context
 
-module Language where
+module Syntax where
 
 data Name : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
   here : ∀{Γ t p} -> CNull Γ -> Name zero (t # p :: Γ) t p

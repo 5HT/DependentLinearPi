@@ -27,7 +27,7 @@ open import Common
 open import Multiplicity
 open import Type
 open import Context
-open import Language
+open import Syntax
 open import Semantics
 open import PrefixedBy
 open import Weakening

@@ -29,7 +29,7 @@ open import Data.Nat
 open import Multiplicity
 open import Type
 open import Context
-open import Language
+open import Syntax
 open import Weakening
 open import HasType
 open import Substitution
