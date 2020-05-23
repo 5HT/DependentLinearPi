@@ -22,9 +22,6 @@ outline of the files and of their purpose:
 * [Language.agda](DLPi/Language.agda) Data types for representing
   **terms** and **processes**. Look no further if you want to see
   `Var`, `Term` and `Process`.
-* [Macros.agda](DLPi/Macros.agda) Some syntactic sugar for pair
-  splitting and conditional processes. Just for fun, not used
-  anywhere.
 * [Main.agda](DLPi/Main.agda) Container for a few **examples**, but
   mostly useful as root file that requires the type checking of
   everything.
@@ -41,8 +38,6 @@ outline of the files and of their purpose:
   given channel can be rewritten in reducible normal form using
   structural pre-congruence. In this normal form, the two prefixes
   sit next to each other, so the process is ready to reduce.
-* [Scaling.agda](DLPi/Scaling.agda) Some auxiliary properties about
-  scaling.
 * [Semantics.agda](DLPi/Semantics.agda) The **operational
   semantics** of DLπ, including structural pre-congruence and
   labelled reduction. Both definitions embed the property that they
