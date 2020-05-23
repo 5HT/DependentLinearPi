@@ -29,16 +29,16 @@ m-scale-split scale1ω = split1ω
 m-scale-split scaleωω = splitωω
 
 t-null-scale : ∀{t v} -> TNull t -> TScale t t v v
-t-null-scale null-p = scale-p
-t-null-scale null-c = scale-c scale00 scale00
+t-null-scale pure = scale-p
+t-null-scale chan = scale-c scale00 scale00
 
 t-null-scale-null-l : ∀{t s v w} -> TNull t -> TScale t s v w -> TNull s
-t-null-scale-null-l null-p scale-p = null-p
-t-null-scale-null-l null-c (scale-c scale00 scale00) = null-c
+t-null-scale-null-l pure scale-p = pure
+t-null-scale-null-l chan (scale-c scale00 scale00) = chan
 
 t-null-scale-null : ∀{t s v w} -> TNull s -> TScale t s v w -> TNull t
-t-null-scale-null null-p scale-p = null-p
-t-null-scale-null null-c (scale-c scale00 scale00) = null-c
+t-null-scale-null pure scale-p = pure
+t-null-scale-null chan (scale-c scale00 scale00) = chan
 
 c-null-scale : ∀{Γ} -> CNull Γ -> CScale Γ Γ
 c-null-scale [] = []

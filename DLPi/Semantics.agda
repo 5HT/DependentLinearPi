@@ -78,23 +78,23 @@ data _<=_ : ∀{Γ} -> Process Γ -> Process Γ -> Set₁ where
     {Q  : Process ΓQ}
     (sp : CSplit Γ ΓP ΓQ) ->
     let sp' = split-c (msplit-l σ) (msplit-l ρ) :: sp in
-    let we = here null-c in
+    let we = here chan in
     Par sp (New P) Q <= New (Par sp' P (weaken-process we Q))
   cong-new-par :
     ∀{Γ Γ1 Γ2 σ ρ t P Q}
     (sp : CSplit Γ Γ1 Γ2)
     (niQ : NotInProcess zero Q) ->
     let sp' = split-c (msplit-l σ) (msplit-l ρ) :: sp in
-    let we = here null-c in
+    let we = here chan in
     New {_} {σ} {ρ} {t} (Par sp' P Q) <= Par sp (New P) (strengthen-process we Q niQ)
   cong-new-idle :
     ∀{Γ t}
     (cz : CNull (Chan #0 #0 t # _ :: Γ)) ->
-    New (Idle cz) <= Idle (strengthen-null (here null-c) cz)
+    New (Idle cz) <= Idle (strengthen-null (here chan) cz)
   cong-idle-new :
     ∀{Γ t}
     (cz : CNull Γ) ->
-    Idle cz <= New {_} {#0} {#0} {t} (Idle (null-c :: cz))
+    Idle cz <= New {_} {#0} {#0} {t} (Idle (chan :: cz))
   cong-rep-par :
     ∀{Γ Δ P}
     (sc : CScale Γ Δ) ->
@@ -126,10 +126,10 @@ cong-par-new-r :
   (P : Process Γ1)
   (Q : Process (Chan m n t # _ :: Γ2)) ->
   let sp' = split-c (msplit-r m) (msplit-r n) :: sp in
-  let we = here null-c in
+  let we = here chan in
   Par sp P (New Q) <= New (Par sp' (weaken-process we P) Q)
 cong-par-new-r {Γ} {Γ1} {Γ2} {m} {n} {t} sp P Q =
-  let we = here null-c in
+  let we = here chan in
   let sp' = split-c {m} {m} {#0} {n} {n} {#0} {t} (msplit-l m) (msplit-l n) :: (csplit-comm sp) in
   let spe = split-c {m} {#0} {m} {n} {#0} {n} {t} (msplit-r m) (msplit-r n) :: sp in
   let pc1 : Par sp P (New Q) <= Par (csplit-comm sp) (New Q) P
@@ -208,7 +208,7 @@ m-split-split-r sp1 sp2 =
   -> Name k Γ (Chan #0 #1 t) _
   -> ∃[ Δ ] ((Γ == L! k => Δ) × CNull Δ)
 !-reduction {_} {_ # _ :: Γ} {t} (here cz) =
-  (Chan #0 #0 t # _ :: Γ) , !-here split10 , null-c :: cz
+  (Chan #0 #0 t # _ :: Γ) , !-here split10 , chan :: cz
 !-reduction {_} {s # _ :: _} (next sz x) =
   let Δ , cout , cz = !-reduction x in
   (s # _ :: Δ) , !-next cout , sz :: cz
@@ -218,7 +218,7 @@ m-split-split-r sp1 sp2 =
   -> Name k Γ (Chan #1 #0 t) _
   -> ∃[ Δ ] ((Γ == L? k => Δ) × CNull Δ)
 ?-reduction {_} {_ # _ :: Γ} {t} (here cz) =
-  (Chan #0 #0 t # _ :: Γ) , ?-here split10 , null-c :: cz
+  (Chan #0 #0 t # _ :: Γ) , ?-here split10 , chan :: cz
 ?-reduction {_} {s # _ :: _} (next sz x) =
   let Δ , cinp , cz = ?-reduction x in
   (s # _ :: Δ) , ?-next cinp , sz :: cz

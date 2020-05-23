@@ -65,7 +65,7 @@ name-null-null (next sz x) tz = sz :: name-null-null x tz
 
 term-null-null : ∀{Γ t v} -> Term Γ t v -> TNull t -> CNull Γ
 term-null-null (name x) tnull = name-null-null x tnull
-term-null-null (pure null _) null-p = null
+term-null-null (pure null _) pure = null
 
 split-name : ∀{k Γ t t1 t2 v v1 v2}
   -> TSplit t t1 t2 v v1 v2
@@ -103,19 +103,19 @@ m-split-zero-eq-r split01 = refl
 m-split-zero-eq-r split0ω = refl
 
 t-split-null-eq-r : ∀{t t1 t2 v v1 v2} -> TSplit t t1 t2 v v1 v2 -> TNull t1 -> t ≡ t2
-t-split-null-eq-r split-p null-p = refl
-t-split-null-eq-r (split-l ()) null-p
-t-split-null-eq-r (split-l ()) null-c
-t-split-null-eq-r (split-r lin-p) null-p = refl
-t-split-null-eq-r (split-c σs ρs) null-c =
+t-split-null-eq-r split-p pure = refl
+t-split-null-eq-r (split-l ()) pure
+t-split-null-eq-r (split-l ()) chan
+t-split-null-eq-r (split-r lin-p) pure = refl
+t-split-null-eq-r (split-c σs ρs) chan =
   cong₂ (λ σ ρ -> Chan σ ρ _) (m-split-zero-eq-r σs) (m-split-zero-eq-r ρs)
 
 t-split-null-eq-rr : ∀{t t1 t2 v v1 v2} -> TSplit t t1 t2 v v1 v2 -> TNull t1 -> t ≡ t2 × v ≅ v2
-t-split-null-eq-rr split-p null-p = refl , _≅_.refl
-t-split-null-eq-rr (split-l ()) null-p
-t-split-null-eq-rr (split-l ()) null-c
-t-split-null-eq-rr (split-r lin-p) null-p = refl , _≅_.refl
-t-split-null-eq-rr (split-c σs ρs) null-c =
+t-split-null-eq-rr split-p pure = refl , _≅_.refl
+t-split-null-eq-rr (split-l ()) pure
+t-split-null-eq-rr (split-l ()) chan
+t-split-null-eq-rr (split-r lin-p) pure = refl , _≅_.refl
+t-split-null-eq-rr (split-c σs ρs) chan =
   cong₂ (λ σ ρ -> Chan σ ρ _) (m-split-zero-eq-r σs) (m-split-zero-eq-r ρs) , _≅_.refl
 
 t-split-eq-rv :
@@ -249,7 +249,7 @@ subst-process sp V ins (Par psp P Q) with split-insert psp ins
   Par sp' (subst-process spP V1 insP P) (subst-process spQ V2 insQ Q)
 subst-process sp e ins (New {_} {m} {n} P) =
   New (subst-process (split-c (msplit-r m) (msplit-r n) :: sp)
-                     (weaken-term (here null-c) e)
+                     (weaken-term (here chan) e)
                      (next ins) P)
 subst-process sp e ins (Rep sc P) with insert-scale ins sc
 ... | _ , _ , _ , ins' , scale-p , sc2 =
