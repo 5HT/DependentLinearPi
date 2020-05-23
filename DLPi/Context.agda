@@ -35,12 +35,6 @@ data CSplit : Context → Context → Context → Set₁ where
   []   : CSplit [] [] []
   _::_ : ∀{t t1 t2 Γ Γ1 Γ2 v v1 v2} → TSplit t t1 t2 v v1 v2 → CSplit Γ Γ1 Γ2 → CSplit (t # v :: Γ) (t1 # v1 :: Γ1) (t2 # v2 :: Γ2)
 
-_≍_ : Context -> Context -> Set₁
-_≍_ Γ1 Γ2 = ∃[ Γ ] CSplit Γ Γ1 Γ2
-
-join : ∀{Γ Δ} -> Γ ≍ Δ -> Context
-join (Γ , _) = Γ
-
 data CScale : Context -> Context -> Set₁ where
   []   : CScale [] []
   _::_ : ∀{Γ Δ t s v w} -> TScale t s v w -> CScale Γ Δ -> CScale (t # v :: Γ) (s # w :: Δ)

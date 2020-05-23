@@ -78,11 +78,6 @@ swap-scale (next sw) (tsc :: sc) =
   let _ , sw , sc = swap-scale sw sc in
   _ , next sw , tsc :: sc
 
-swap-comp : ∀{n Δ Γ1 Γ2} -> (comp : Γ1 ≍ Γ2) -> Swap n (join comp) Δ -> ∃[ Δ1 ] ∃[ Δ2 ] (Δ1 ≍ Δ2 × Swap n Γ1 Δ1 × Swap n Γ2 Δ2)
-swap-comp (_ , sp) sw =
-  let _ , _ , sp , sw1 , sw2 = swap-split sw sp in
-  _ , _ , (_ , sp) , sw1 , sw2
-
 swap-process : ∀{n Γ Δ} -> Swap n Γ Δ -> Process Γ -> Process Δ
 swap-process sw (Idle cz) = Idle (swap-null sw cz)
 swap-process sw (Send sp ec em) =
