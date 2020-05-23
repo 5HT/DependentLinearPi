@@ -207,10 +207,10 @@ prefixed-cong (prefixed-par-r _ pb) (cong-par-assoc-lr sp1 sp2) =
 prefixed-cong (prefixed-new (prefixed-new {P = P} pb)) cong-new-new =
   prefixed-new (prefixed-new (swap-prefixed here P pb))
 prefixed-cong (prefixed-par-l _ (prefixed-new pb)) (cong-par-new {σ = m} {ρ = n} sp) =
-  let sp' = split-c (msplit-l m) (msplit-l n) :: sp in
+  let sp' = chan (msplit-l m) (msplit-l n) :: sp in
   prefixed-new (prefixed-par-l sp' pb)
 prefixed-cong (prefixed-par-r {Q = Q} _ pb) (cong-par-new {σ = m} {ρ = n} sp) =
-  let sp' = split-c (msplit-l m) (msplit-l n) :: sp in
+  let sp' = chan (msplit-l m) (msplit-l n) :: sp in
   let we = here chan in
   prefixed-new (prefixed-par-r sp' (weaken-prefixed we Q pb))
 prefixed-cong (prefixed-new (prefixed-par-l _ pb)) (cong-new-par sp _) =

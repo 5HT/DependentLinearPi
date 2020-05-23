@@ -42,12 +42,12 @@ open import Data.Product
 successor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ))) # _ :: [])
 successor =
   Rep (chan scale1ω scale00 :: []) $
-  Recv (split-c split10 split00 :: [])
+  Recv (chan split10 split00 :: [])
        (name (here []))
        λ (x , _) ->
-  Let (split-l pair :: split-c split00 split00 :: [])
+  Let (left pair :: chan split00 split00 :: [])
       (name (here (chan :: []))) $
-  Send (split-p :: split-c split00 split10 :: split-p :: split-c split00 split00 :: [])
+  Send (pure :: chan split00 split10 :: pure :: chan split00 split00 :: [])
        (name (next pure (here (pure :: chan :: []))))
        (pure (pure :: chan :: pure :: chan :: []) (suc x))
 
@@ -56,14 +56,14 @@ successor =
 predecessor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Pair (Pure (n ≢ 0)) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ)))) # _ :: [])
 predecessor =
   Rep (chan scale1ω scale00 :: []) $
-  Recv (split-c split10 split00 :: [])
+  Recv (chan split10 split00 :: [])
        (name (here []))
        λ (x , p , _) ->
-  Let (split-l pair :: split-c split00 split00 :: [])
+  Let (left pair :: chan split00 split00 :: [])
       (name (here (chan :: []))) $
-  Let (split-p :: split-l pair :: split-p :: split-c split00 split00 :: [])
+  Let (pure :: left pair :: pure :: chan split00 split00 :: [])
       (name (next pure (here (pure :: chan :: [])))) $
-  Send (split-p :: split-c split00 split10 :: split-p :: split-p :: split-p :: split-c split00 split00 :: [])
+  Send (pure :: chan split00 split10 :: pure :: pure :: pure :: chan split00 split00 :: [])
        (name (next pure (here (pure :: pure :: pure :: chan :: []))))
        (pure (pure :: chan :: pure :: pure :: pure :: chan :: []) (checked-pred x p))
   where
@@ -85,24 +85,24 @@ recv-type = Chan #1 #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Chan #1 #0 (
 
 send-data : ∀{Γ}(n : ℕ) -> CNull Γ -> Process (Chan #0 #1 (data-type n) # _ :: Γ)
 send-data zero null =
-  Send (split-c split00 split10 :: c-null-split null)
+  Send (chan split00 split10 :: c-null-split null)
        (name (here null))
        (pure (chan :: null) zero)
 send-data (suc n) null =
-  New (Par (split-c split10 split01 :: split-c split00 split10 :: c-null-split null)
-           (Send (split-c split01 split00 :: split-c split00 split10 :: c-null-split null)
+  New (Par (chan split10 split01 :: chan split00 split10 :: c-null-split null)
+           (Send (chan split01 split00 :: chan split00 split10 :: c-null-split null)
                  (name (next chan (here null)))
-                 (pair (split-c split01 split00 :: split-c split00 split00 :: c-null-split null)
+                 (pair (chan split01 split00 :: chan split00 split00 :: c-null-split null)
                        (pure (chan :: chan :: null) (suc n))
                        (name (here (chan :: null)))))
            (send-data n (chan :: null)))
 
 send : (n : ℕ) -> Process (send-type # _ :: [])
 send n =
-  New (Par (split-c split10 split01 :: split-c split00 split10 :: [])
-           (Send (split-c split01 split00 :: split-c split00 split10 :: [])
+  New (Par (chan split10 split01 :: chan split00 split10 :: [])
+           (Send (chan split01 split00 :: chan split00 split10 :: [])
                  (name (next chan (here [])))
-                 (pair (split-c split01 split00 :: split-c split00 split00 :: [])
+                 (pair (chan split01 split00 :: chan split00 split00 :: [])
                        (pure (chan :: chan :: []) n)
                        (name (here (chan :: [])))))
            (send-data n (chan :: [])))
@@ -111,23 +111,23 @@ send n =
 
 recv-data : ∀{Γ} -> CNull Γ -> (n : ℕ) -> Process (Chan #1 #0 (data-type n) # _ :: Γ)
 recv-data null zero =
-  Recv (split-c split10 split00 :: c-null-split null)
+  Recv (chan split10 split00 :: c-null-split null)
        (name (here null))
        (λ _ -> Idle (pure :: chan :: null))
 recv-data null (suc n) =
-  Recv (split-c split10 split00 :: c-null-split null)
+  Recv (chan split10 split00 :: c-null-split null)
        (name (here null))
        λ _ ->
-  Let (split-l pair :: split-c split00 split00 :: c-null-split null)
+  Let (left pair :: chan split00 split00 :: c-null-split null)
       (name (here (chan :: null))) $
   weaken-process (here pure) (recv-data (pure :: chan :: null) n)
 
 recv : Process (recv-type # _ :: [])
 recv =
-  Recv (split-c split10 split00 :: [])
+  Recv (chan split10 split00 :: [])
        (name (here []))
        λ (n , _) ->
-  Let (split-l pair :: split-c split00 split00 :: [])
+  Let (left pair :: chan split00 split00 :: [])
       (name (here (chan :: []))) $
   weaken-process (here pure) (recv-data (pure :: chan :: []) n)
 
@@ -135,13 +135,13 @@ recv =
 
 echo : Process (Chan #ω #0 (fold (Pair (Pure ℕ) (λ x -> Chan #0 #1 (fold (Pair (Pure ℕ) λ y -> Pure (x ≡ y)))))) # _ :: [])
 echo = Rep ((chan scale1ω scale00) :: []) $
-       Recv (split-c split10 split00 :: [])
+       Recv (chan split10 split00 :: [])
             (name (here []))
             λ (x , _) ->
-       Let (split-l pair :: split-c split00 split00 :: [])
+       Let (left pair :: chan split00 split00 :: [])
            (name (here (chan :: []))) $
-       Send (split-p :: split-c split00 split10 :: split-p :: split-c split00 split00 :: [])
+       Send (pure :: chan split00 split10 :: pure :: chan split00 split00 :: [])
             (name (next pure (here (pure :: (chan :: [])))))
-            (pair (split-p :: split-c split00 split00 :: split-p :: split-c split00 split00 :: [])
+            (pair (pure :: chan split00 split00 :: pure :: chan split00 split00 :: [])
                   (pure (pure :: chan :: pure :: chan :: []) x)
                   (pure (pure :: chan :: pure :: chan :: []) refl))

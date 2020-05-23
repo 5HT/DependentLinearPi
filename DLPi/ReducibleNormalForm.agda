@@ -99,7 +99,7 @@ pnf-pnf-rnf sp1 P (Par sp2 Q1 Q2) pnfP@(pnf-send _) (pnf-par _ pnfQ1) =
 pnf-pnf-rnf sp P (New {_} {m} {n} Q) pnfP@(pnf-send _) (pnf-new pnfQ) =
   let we = here chan in
   let P' = weaken-process we P in
-  let sp' = split-c (msplit-r m) (msplit-r n) :: sp in
+  let sp' = chan (msplit-r m) (msplit-r n) :: sp in
   let R , P'|Q<=R , rnf = pnf-pnf-rnf sp' P' Q (weaken-pnf P we pnfP) pnfQ in
   New R ,
   cong-trans (cong-par-new-r sp P Q) (cong-new-cong P'|Q<=R) ,
@@ -114,7 +114,7 @@ pnf-pnf-rnf sp1 (Par sp2 P1 P2) Q (pnf-par _ pnfP) pnfQ =
   rnf-par sp1'' rnf
 pnf-pnf-rnf sp (New {_} {m} {n} P) Q (pnf-new pnfP) pnfQ =
   let we = here chan in
-  let sp' = split-c (msplit-l m) (msplit-l n) :: sp in
+  let sp' = chan (msplit-l m) (msplit-l n) :: sp in
   let Q' = weaken-process we Q in
   let R , P|Q<=R , rnf = pnf-pnf-rnf sp' P Q' pnfP (weaken-pnf Q we pnfQ) in
   New R ,

@@ -83,12 +83,12 @@ split-term :
   ∃[ Γ1 ] ∃[ Γ2 ] (CSplit Γ Γ1 Γ2 × Term Γ1 t1 v1 × Term Γ2 t2 v2)
 split-term sp (name x) with split-name sp x
 ... | _ , _ , csp , x1 , x2 = _ , _ , csp , name x1 , name x2
-split-term split-p E@(pure null c) =
+split-term pure E@(pure null c) =
   _ , _ , c-null-split null , E , E
-split-term {Γ} (split-l lin) E =
+split-term {Γ} (left lin) E =
   let _ , null , sp = csplit-l Γ in
   _ , _ , sp , E , pure null tt
-split-term {Γ} (split-r lin) E =
+split-term {Γ} (right lin) E =
   let _ , null , sp = csplit-r Γ in
   _ , _ , sp , pure null tt , E
 
@@ -103,36 +103,36 @@ m-split-zero-eq-r split01 = refl
 m-split-zero-eq-r split0ω = refl
 
 t-split-null-eq-r : ∀{t t1 t2 v v1 v2} -> TSplit t t1 t2 v v1 v2 -> TNull t1 -> t ≡ t2
-t-split-null-eq-r split-p pure = refl
-t-split-null-eq-r (split-l ()) pure
-t-split-null-eq-r (split-l ()) chan
-t-split-null-eq-r (split-r lin-p) pure = refl
-t-split-null-eq-r (split-c σs ρs) chan =
+t-split-null-eq-r pure pure = refl
+t-split-null-eq-r (left ()) pure
+t-split-null-eq-r (left ()) chan
+t-split-null-eq-r (right lin-p) pure = refl
+t-split-null-eq-r (chan σs ρs) chan =
   cong₂ (λ σ ρ -> Chan σ ρ _) (m-split-zero-eq-r σs) (m-split-zero-eq-r ρs)
 
 t-split-null-eq-rr : ∀{t t1 t2 v v1 v2} -> TSplit t t1 t2 v v1 v2 -> TNull t1 -> t ≡ t2 × v ≅ v2
-t-split-null-eq-rr split-p pure = refl , _≅_.refl
-t-split-null-eq-rr (split-l ()) pure
-t-split-null-eq-rr (split-l ()) chan
-t-split-null-eq-rr (split-r lin-p) pure = refl , _≅_.refl
-t-split-null-eq-rr (split-c σs ρs) chan =
+t-split-null-eq-rr pure pure = refl , _≅_.refl
+t-split-null-eq-rr (left ()) pure
+t-split-null-eq-rr (left ()) chan
+t-split-null-eq-rr (right lin-p) pure = refl , _≅_.refl
+t-split-null-eq-rr (chan σs ρs) chan =
   cong₂ (λ σ ρ -> Chan σ ρ _) (m-split-zero-eq-r σs) (m-split-zero-eq-r ρs) , _≅_.refl
 
 t-split-eq-rv :
   ∀{t t1 v v1 v2} ->
   TSplit t t1 t v v1 v2 ->
   v ≡ v2
-t-split-eq-rv split-p = refl
-t-split-eq-rv (split-r _) = refl
-t-split-eq-rv (split-c _ _) = refl
+t-split-eq-rv pure = refl
+t-split-eq-rv (right _) = refl
+t-split-eq-rv (chan _ _) = refl
 
 t-split-eq-lv :
   ∀{t t2 v v1 v2} ->
   TSplit t t t2 v v1 v2 ->
   v ≡ v1
-t-split-eq-lv split-p = refl
-t-split-eq-lv (split-l _ ) = refl
-t-split-eq-lv (split-c _ _) = refl
+t-split-eq-lv pure = refl
+t-split-eq-lv (left _ ) = refl
+t-split-eq-lv (chan _ _) = refl
 
 t-split-null-eq-l : ∀{t t1 t2 v v1 v2} -> TSplit t t1 t2 v v1 v2 -> TNull t2 -> t ≡ t1
 t-split-null-eq-l sp = t-split-null-eq-r (tsplit-comm sp)
@@ -248,7 +248,7 @@ subst-process sp V ins (Par psp P Q) with split-insert psp ins
   let _ , _ , sp' , spP , spQ = c-split-split-split sp esp' psp' in
   Par sp' (subst-process spP V1 insP P) (subst-process spQ V2 insQ Q)
 subst-process sp e ins (New {_} {m} {n} P) =
-  New (subst-process (split-c (msplit-r m) (msplit-r n) :: sp)
+  New (subst-process (chan (msplit-r m) (msplit-r n) :: sp)
                      (weaken-term (here chan) e)
                      (next ins) P)
 subst-process sp e ins (Rep sc P) with insert-scale ins sc

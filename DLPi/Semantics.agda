@@ -77,14 +77,14 @@ data _<=_ : ∀{Γ} -> Process Γ -> Process Γ -> Set₁ where
     {P  : Process (Chan σ ρ t # _ :: ΓP)}
     {Q  : Process ΓQ}
     (sp : CSplit Γ ΓP ΓQ) ->
-    let sp' = split-c (msplit-l σ) (msplit-l ρ) :: sp in
+    let sp' = chan (msplit-l σ) (msplit-l ρ) :: sp in
     let we = here chan in
     Par sp (New P) Q <= New (Par sp' P (weaken-process we Q))
   cong-new-par :
     ∀{Γ Γ1 Γ2 σ ρ t P Q}
     (sp : CSplit Γ Γ1 Γ2)
     (niQ : NotInProcess zero Q) ->
-    let sp' = split-c (msplit-l σ) (msplit-l ρ) :: sp in
+    let sp' = chan (msplit-l σ) (msplit-l ρ) :: sp in
     let we = here chan in
     New {_} {σ} {ρ} {t} (Par sp' P Q) <= Par sp (New P) (strengthen-process we Q niQ)
   cong-new-idle :
@@ -125,13 +125,13 @@ cong-par-new-r :
   (sp : CSplit Γ Γ1 Γ2)
   (P : Process Γ1)
   (Q : Process (Chan m n t # _ :: Γ2)) ->
-  let sp' = split-c (msplit-r m) (msplit-r n) :: sp in
+  let sp' = chan (msplit-r m) (msplit-r n) :: sp in
   let we = here chan in
   Par sp P (New Q) <= New (Par sp' (weaken-process we P) Q)
 cong-par-new-r {Γ} {Γ1} {Γ2} {m} {n} {t} sp P Q =
   let we = here chan in
-  let sp' = split-c {m} {m} {#0} {n} {n} {#0} {t} (msplit-l m) (msplit-l n) :: (csplit-comm sp) in
-  let spe = split-c {m} {#0} {m} {n} {#0} {n} {t} (msplit-r m) (msplit-r n) :: sp in
+  let sp' = chan {m} {m} {#0} {n} {n} {#0} {t} (msplit-l m) (msplit-l n) :: (csplit-comm sp) in
+  let spe = chan {m} {#0} {m} {n} {#0} {n} {t} (msplit-r m) (msplit-r n) :: sp in
   let pc1 : Par sp P (New Q) <= Par (csplit-comm sp) (New Q) P
       pc1 = cong-par-comm sp
       pc2 : Par (csplit-comm sp) (New Q) P <= New (Par sp' Q (weaken-process we P))
@@ -141,7 +141,7 @@ cong-par-new-r {Γ} {Γ1} {Γ2} {m} {n} {t} sp P Q =
       pce : New (Par sp' Q (weaken-process we P)) <= New (Par spe (weaken-process we P) Q)
       pce = subst (λ x -> New (Par sp' Q (weaken-process we P)) <= New (Par x (weaken-process we P) Q))
                   (cong₂ _::_
-                         (cong₂ split-c (msplit-comm-lr m) (msplit-comm-lr n))
+                         (cong₂ chan (msplit-comm-lr m) (msplit-comm-lr n))
                          (csplit-comm-inv sp))
                   pc3
   in
@@ -229,10 +229,10 @@ m-split-split-r sp1 sp2 =
   -> Γ1 == L! k => Δ1
   -> Γ2 == L? k => Δ2
   -> ∃[ Δ ] ((Γ == L# k => Δ) × CSplit Δ Δ1 Δ2)
-#-reduction (split-c ms ns :: sp) (!-here rs) (?-here ss) =
+#-reduction (chan ms ns :: sp) (!-here rs) (?-here ss) =
   let _ , ns' , rs' = m-split-split-l ns rs in
   let _ , ms' , ss' = m-split-split-r ms ss in
-  _ , #-here ss' rs' , split-c ms' ns' :: sp
+  _ , #-here ss' rs' , chan ms' ns' :: sp
 #-reduction (ts :: sp) (!-next cr1) (?-next cr2) =
   let _ , cr , sp' = #-reduction sp cr1 cr2 in
   _ , #-next cr , ts :: sp'
@@ -243,16 +243,16 @@ split-reduction :
   -> Γ1 == l => Δ1
   -> ∃[ Δ ] ((Γ == l => Δ) × CSplit Δ Δ1 Γ2)
 split-reduction {Γ} sp tau = Γ , tau , sp
-split-reduction (split-c ms ns :: sp) (?-here rs) =
+split-reduction (chan ms ns :: sp) (?-here rs) =
   let _ , ms' , rs' = m-split-split-l ms rs in
-  _ , ?-here rs' , split-c ms' ns :: sp
-split-reduction (split-c ms ns :: sp) (!-here rs) =
+  _ , ?-here rs' , chan ms' ns :: sp
+split-reduction (chan ms ns :: sp) (!-here rs) =
   let _ , ns' , rs' = m-split-split-l ns rs in
-  _ , !-here rs' , split-c ms ns' :: sp
-split-reduction (split-c ms ns :: sp) (#-here rs ss) =
+  _ , !-here rs' , chan ms ns' :: sp
+split-reduction (chan ms ns :: sp) (#-here rs ss) =
   let _ , ms' , rs' = m-split-split-l ms rs in
   let _ , ns' , ss' = m-split-split-l ns ss in
-  _ , #-here rs' ss' , split-c ms' ns' :: sp
+  _ , #-here rs' ss' , chan ms' ns' :: sp
 split-reduction (ts :: sp) (?-next cr) =
   let _ , tr' , sp' = split-reduction sp cr in
   _ , ?-next tr' , ts :: sp'
@@ -269,7 +269,7 @@ tsplit-type-eq :
   -> TSplit t1 (Chan m1 n1 t11) t12 v1 _ v12
   -> TSplit t2 (Chan m2 n2 t21) t22 v2 _ v22
   -> t11 ≡ t21
-tsplit-type-eq (split-c _ _) (split-c _ _) (split-c _ _) = refl
+tsplit-type-eq (chan _ _) (chan _ _) (chan _ _) = refl
 
 csplit-type-eq :
   ∀{k Γ Γ1 Γ2 Γ11 Γ12 Γ21 Γ22 m1 n1 m2 n2 t s}

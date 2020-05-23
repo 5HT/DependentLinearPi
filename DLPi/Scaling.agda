@@ -45,8 +45,8 @@ c-null-scale [] = []
 c-null-scale (tnull :: null) = t-null-scale tnull :: c-null-scale null
 
 t-scale-split : ∀{t s v w} -> TScale t s v w -> TSplit s t s w v w
-t-scale-split pure = split-p
-t-scale-split (chan σsc ρsc) = split-c (m-scale-split σsc) (m-scale-split ρsc)
+t-scale-split pure = pure
+t-scale-split (chan σsc ρsc) = chan (m-scale-split σsc) (m-scale-split ρsc)
 
 c-scale-split : ∀{Γ Δ} -> CScale Γ Δ -> CSplit Δ Γ Δ
 c-scale-split [] = []
@@ -74,15 +74,15 @@ t-split-scale-scale :
   TScale t1 s1 v1 w1 ->
   TScale t2 s2 v2 w2 ->
   ∃[ t ] ∃[ v ] (TScale t s v w × TSplit t t1 t2 v v1 v2)
-t-split-scale-scale (split-l lin) pure pure = _ , _ , pure , split-l lin
-t-split-scale-scale (split-l ()) (chan _ _) _
-t-split-scale-scale (split-r lin) pure pure = _ , _ , pure , split-r lin
-t-split-scale-scale (split-r ()) pure (chan _ _)
-t-split-scale-scale split-p pure pure = _ , _ , pure , split-p
-t-split-scale-scale (split-c σs ρs) (chan σsc1 ρsc1) (chan σsc2 ρsc2) =
+t-split-scale-scale (left lin) pure pure = _ , _ , pure , left lin
+t-split-scale-scale (left ()) (chan _ _) _
+t-split-scale-scale (right lin) pure pure = _ , _ , pure , right lin
+t-split-scale-scale (right ()) pure (chan _ _)
+t-split-scale-scale pure pure pure = _ , _ , pure , pure
+t-split-scale-scale (chan σs ρs) (chan σsc1 ρsc1) (chan σsc2 ρsc2) =
   let _ , σsc , σs' = m-split-scale-scale σs σsc1 σsc2 in
   let _ , ρsc , ρs' = m-split-scale-scale ρs ρsc1 ρsc2 in
-  _ , _ , chan σsc ρsc , split-c σs' ρs'
+  _ , _ , chan σsc ρsc , chan σs' ρs'
 
 c-split-scale-scale :
   ∀{Γ1 Γ2 Δ Δ1 Δ2} ->

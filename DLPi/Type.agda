@@ -58,39 +58,39 @@ data TNull : Type -> Set₁ where
   chan : ∀{t} -> TNull (Chan #0 #0 t)
 
 data TSplit : (t : Type) → (t1 : Type) → (t2 : Type) → ⟦ t ⟧ -> ⟦ t1 ⟧ -> ⟦ t2 ⟧ -> Set₁ where
-  split-p : ∀{A v} -> TSplit (Pure A) (Pure A) (Pure A) v v v
-  split-l : ∀{t v} -> Linear t -> TSplit t t (Pure ⊤) v v tt
-  split-r : ∀{t v} -> Linear t -> TSplit t (Pure ⊤) t v tt v
-  split-c : ∀{m m1 m2 n n1 n2 t} → MSplit m m1 m2 → MSplit n n1 n2 → TSplit (Chan m n t) (Chan m1 n1 t) (Chan m2 n2 t) tt tt tt
+  pure  : ∀{A v} -> TSplit (Pure A) (Pure A) (Pure A) v v v
+  left  : ∀{t v} -> Linear t -> TSplit t t (Pure ⊤) v v tt
+  right : ∀{t v} -> Linear t -> TSplit t (Pure ⊤) t v tt v
+  chan  : ∀{m m1 m2 n n1 n2 t} → MSplit m m1 m2 → MSplit n n1 n2 → TSplit (Chan m n t) (Chan m1 n1 t) (Chan m2 n2 t) tt tt tt
 
 data TScale : (t : Type) -> (s : Type) -> ⟦ t ⟧ -> ⟦ s ⟧ -> Set₁ where
   pure : ∀{A v} -> TScale (Pure A) (Pure A) v v
   chan : ∀{σ σ' ρ ρ' t} -> MScale σ σ' -> MScale ρ ρ' -> TScale (Chan σ ρ t) (Chan σ' ρ' t) _ _
 
 t-null-split-null-null : ∀{t t1 t2 v v1 v2} -> TNull t -> TSplit t t1 t2 v v1 v2 -> TNull t1 × TNull t2
-t-null-split-null-null pure split-p = pure , pure
-t-null-split-null-null chan (split-c split00 split00) = chan , chan
+t-null-split-null-null pure pure = pure , pure
+t-null-split-null-null chan (chan split00 split00) = chan , chan
 
 t-null-split : ∀{t v} -> TNull t -> TSplit t t t v v v
-t-null-split pure = split-p
-t-null-split chan = split-c split00 split00
+t-null-split pure = pure
+t-null-split chan = chan split00 split00
 
 tsplit-comm : ∀{t t1 t2 v v1 v2} -> TSplit t t1 t2 v v1 v2 -> TSplit t t2 t1 v v2 v1
-tsplit-comm split-p = split-p
-tsplit-comm (split-l lin) = split-r lin
-tsplit-comm (split-r lin) = split-l lin
-tsplit-comm (split-c σs ρs) = split-c (msplit-comm σs) (msplit-comm ρs)
+tsplit-comm pure = pure
+tsplit-comm (left lin) = right lin
+tsplit-comm (right lin) = left lin
+tsplit-comm (chan σs ρs) = chan (msplit-comm σs) (msplit-comm ρs)
 
 tsplit-comm-inv : ∀{t t1 t2 v v1 v2} -> (ts : TSplit t t1 t2 v v1 v2) -> tsplit-comm (tsplit-comm ts) ≡ ts
-tsplit-comm-inv split-p = refl
-tsplit-comm-inv (split-l _) = refl
-tsplit-comm-inv (split-r _) = refl
-tsplit-comm-inv (split-c σs ρs) = cong₂ split-c (msplit-comm-inv σs) (msplit-comm-inv ρs)
+tsplit-comm-inv pure = refl
+tsplit-comm-inv (left _) = refl
+tsplit-comm-inv (right _) = refl
+tsplit-comm-inv (chan σs ρs) = cong₂ chan (msplit-comm-inv σs) (msplit-comm-inv ρs)
 
 tsplit-l : ∀(t : Type){v} -> ∃[ s ] ∃[ w ] (TNull s × TSplit t t s v v w)
-tsplit-l (Pure _) = _ , _ , pure , split-p
-tsplit-l (Chan σ ρ t) = _ , _ , chan , split-c (msplit-l σ) (msplit-l ρ)
-tsplit-l (Pair _ _) = _ , _ , pure , split-l pair
+tsplit-l (Pure _) = _ , _ , pure , pure
+tsplit-l (Chan σ ρ t) = _ , _ , chan , chan (msplit-l σ) (msplit-l ρ)
+tsplit-l (Pair _ _) = _ , _ , pure , left pair
 
 tsplit-r : ∀(t : Type){v} -> ∃[ s ] ∃[ w ] (TNull s × TSplit t s t v w v)
 tsplit-r t =
@@ -102,14 +102,14 @@ tsplit-assoc-rl :
   -> TSplit t t1 t23 v v1 v23
   -> TSplit t23 t2 t3 v23 v2 v3
   -> ∃[ s ] ∃[ w ] (TSplit t s t3 v w v3 × TSplit s t1 t2 w v1 v2)
-tsplit-assoc-rl split-p split-p = _ , _ , split-p , split-p
-tsplit-assoc-rl (split-l lin) split-p = _ , _ , split-l lin , split-l lin
-tsplit-assoc-rl (split-r lin) (split-l _) = _ , _ , split-l lin , split-r lin
-tsplit-assoc-rl (split-r lin) (split-r _) = _ , _ , split-r lin , split-p
-tsplit-assoc-rl (split-c σs1 ρs1) (split-c σs2 ρs2) =
+tsplit-assoc-rl pure pure = _ , _ , pure , pure
+tsplit-assoc-rl (left lin) pure = _ , _ , left lin , left lin
+tsplit-assoc-rl (right lin) (left _) = _ , _ , left lin , right lin
+tsplit-assoc-rl (right lin) (right _) = _ , _ , right lin , pure
+tsplit-assoc-rl (chan σs1 ρs1) (chan σs2 ρs2) =
   let _ , σs1 , σs2 = msplit-assoc-rl σs1 σs2 in
   let _ , ρs1 , ρs2 = msplit-assoc-rl ρs1 ρs2 in
-  _ , _ , split-c σs1 ρs1 , split-c σs2 ρs2
+  _ , _ , chan σs1 ρs1 , chan σs2 ρs2
 
 tsplit-assoc-lr :
   ∀{t t12 t1 t2 t3 v v12 v1 v2 v3}
@@ -121,12 +121,12 @@ tsplit-assoc-lr sp1 sp2 =
   _ , _ , tsplit-comm sp1' , tsplit-comm sp2'
 
 t-null-null-split-null : ∀{t t1 t2 v v1 v2} -> TNull t1 -> TNull t2 -> TSplit t t1 t2 v v1 v2 -> TNull t
-t-null-null-split-null pure pure split-p = pure
-t-null-null-split-null pure pure (split-l _) = pure
-t-null-null-split-null chan pure (split-l _) = chan
-t-null-null-split-null pure pure (split-r _) = pure
-t-null-null-split-null pure chan (split-r _) = chan
-t-null-null-split-null chan chan (split-c split00 split00) = chan
+t-null-null-split-null pure pure pure = pure
+t-null-null-split-null pure pure (left _) = pure
+t-null-null-split-null chan pure (left _) = chan
+t-null-null-split-null pure pure (right _) = pure
+t-null-null-split-null pure chan (right _) = chan
+t-null-null-split-null chan chan (chan split00 split00) = chan
 
 t-split-split-split :
   ∀{s t1 t2 t11 t12 t21 t22 w v1 v2 v11 v12 v21 v22}
