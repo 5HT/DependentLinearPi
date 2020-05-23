@@ -24,21 +24,21 @@ open import Context
 open import Language
 
 m-scale-split : ∀{m n} -> MScale m n -> MSplit n m n
-m-scale-split scale00 = split00
-m-scale-split scale1ω = split1ω
-m-scale-split scaleωω = splitωω
+m-scale-split 0·0 = 0+0
+m-scale-split 1·ω = 1+ω
+m-scale-split ω·ω = ω+ω
 
 t-null-scale : ∀{t v} -> TNull t -> TScale t t v v
 t-null-scale pure = pure
-t-null-scale chan = chan scale00 scale00
+t-null-scale chan = chan 0·0 0·0
 
 t-null-scale-null-l : ∀{t s v w} -> TNull t -> TScale t s v w -> TNull s
 t-null-scale-null-l pure pure = pure
-t-null-scale-null-l chan (chan scale00 scale00) = chan
+t-null-scale-null-l chan (chan 0·0 0·0) = chan
 
 t-null-scale-null : ∀{t s v w} -> TNull s -> TScale t s v w -> TNull t
 t-null-scale-null pure pure = pure
-t-null-scale-null chan (chan scale00 scale00) = chan
+t-null-scale-null chan (chan 0·0 0·0) = chan
 
 c-null-scale : ∀{Γ} -> CNull Γ -> CScale Γ Γ
 c-null-scale [] = []
@@ -58,15 +58,15 @@ m-split-scale-scale :
   MScale σ1 ρ1 ->
   MScale σ2 ρ2 ->
   ∃[ σ ] (MScale σ ρ × MSplit σ σ1 σ2)
-m-split-scale-scale split00 scale00 scale00 = _ , scale00 , split00
-m-split-scale-scale split0ω scale00 scale1ω = _ , scale1ω , split01
-m-split-scale-scale split0ω scale00 scaleωω = _ , scaleωω , split0ω
-m-split-scale-scale splitω0 scale1ω scale00 = _ , scale1ω , split10
-m-split-scale-scale splitω0 scaleωω scale00 = _ , scaleωω , splitω0
-m-split-scale-scale splitωω scale1ω scale1ω = _ , scaleωω , split11
-m-split-scale-scale splitωω scale1ω scaleωω = _ , scaleωω , split1ω
-m-split-scale-scale splitωω scaleωω scale1ω = _ , scaleωω , splitω1
-m-split-scale-scale splitωω scaleωω scaleωω = _ , scaleωω , splitωω
+m-split-scale-scale 0+0 0·0 0·0 = _ , 0·0 , 0+0
+m-split-scale-scale 0+ω 0·0 1·ω = _ , 1·ω , 0+1
+m-split-scale-scale 0+ω 0·0 ω·ω = _ , ω·ω , 0+ω
+m-split-scale-scale ω+0 1·ω 0·0 = _ , 1·ω , 1+0
+m-split-scale-scale ω+0 ω·ω 0·0 = _ , ω·ω , ω+0
+m-split-scale-scale ω+ω 1·ω 1·ω = _ , ω·ω , 1+1
+m-split-scale-scale ω+ω 1·ω ω·ω = _ , ω·ω , 1+ω
+m-split-scale-scale ω+ω ω·ω 1·ω = _ , ω·ω , ω+1
+m-split-scale-scale ω+ω ω·ω ω·ω = _ , ω·ω , ω+ω
 
 t-split-scale-scale :
   ∀{s t1 t2 s1 s2 w v1 v2 w1 w2} ->

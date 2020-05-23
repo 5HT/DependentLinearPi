@@ -69,11 +69,11 @@ data TScale : (t : Type) -> (s : Type) -> ⟦ t ⟧ -> ⟦ s ⟧ -> Set₁ where
 
 t-null-split-null-null : ∀{t t1 t2 v v1 v2} -> TNull t -> TSplit t t1 t2 v v1 v2 -> TNull t1 × TNull t2
 t-null-split-null-null pure pure = pure , pure
-t-null-split-null-null chan (chan split00 split00) = chan , chan
+t-null-split-null-null chan (chan 0+0 0+0) = chan , chan
 
 t-null-split : ∀{t v} -> TNull t -> TSplit t t t v v v
 t-null-split pure = pure
-t-null-split chan = chan split00 split00
+t-null-split chan = chan 0+0 0+0
 
 tsplit-comm : ∀{t t1 t2 v v1 v2} -> TSplit t t1 t2 v v1 v2 -> TSplit t t2 t1 v v2 v1
 tsplit-comm pure = pure
@@ -126,7 +126,7 @@ t-null-null-split-null pure pure (left _) = pure
 t-null-null-split-null chan pure (left _) = chan
 t-null-null-split-null pure pure (right _) = pure
 t-null-null-split-null pure chan (right _) = chan
-t-null-null-split-null chan chan (chan split00 split00) = chan
+t-null-null-split-null chan chan (chan 0+0 0+0) = chan
 
 t-split-split-split :
   ∀{s t1 t2 t11 t12 t21 t22 w v1 v2 v11 v12 v21 v22}

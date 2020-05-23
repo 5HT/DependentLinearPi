@@ -93,14 +93,14 @@ split-term {Γ} (right lin) E =
   _ , _ , sp , pure null tt , E
 
 m-split-zero-eq-l : ∀{m n} -> MSplit m n #0 -> m ≡ n
-m-split-zero-eq-l split00 = refl
-m-split-zero-eq-l split10 = refl
-m-split-zero-eq-l splitω0 = refl
+m-split-zero-eq-l 0+0 = refl
+m-split-zero-eq-l 1+0 = refl
+m-split-zero-eq-l ω+0 = refl
 
 m-split-zero-eq-r : ∀{m n} -> MSplit m #0 n -> m ≡ n
-m-split-zero-eq-r split00 = refl
-m-split-zero-eq-r split01 = refl
-m-split-zero-eq-r split0ω = refl
+m-split-zero-eq-r 0+0 = refl
+m-split-zero-eq-r 0+1 = refl
+m-split-zero-eq-r 0+ω = refl
 
 t-split-null-eq-r : ∀{t t1 t2 v v1 v2} -> TSplit t t1 t2 v v1 v2 -> TNull t1 -> t ≡ t2
 t-split-null-eq-r pure pure = refl
@@ -252,8 +252,8 @@ subst-process sp e ins (New {_} {m} {n} P) =
                      (weaken-term (here chan) e)
                      (next ins) P)
 subst-process sp e ins (Rep sc P) with insert-scale ins sc
-... | _ , _ , _ , ins' , scale-p , sc2 =
-  let _ , sc1 , F = scale-term scale-p e in
+... | _ , _ , _ , ins' , pure , sc2 =
+  let _ , sc1 , F = scale-term pure e in
   let _ , sc' , sp' = c-split-scale-scale sp sc1 sc2 in
   Rep sc' (subst-process sp' F ins' P)
 ... | _ , _ , _ , ins' , tsc@(chan _ _) , sc2 =

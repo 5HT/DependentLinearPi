@@ -208,7 +208,7 @@ m-split-split-r sp1 sp2 =
   -> Name k Γ (Chan #0 #1 t) _
   -> ∃[ Δ ] ((Γ == L! k => Δ) × CNull Δ)
 !-reduction {_} {_ # _ :: Γ} {t} (here cz) =
-  (Chan #0 #0 t # _ :: Γ) , !-here split10 , chan :: cz
+  (Chan #0 #0 t # _ :: Γ) , !-here 1+0 , chan :: cz
 !-reduction {_} {s # _ :: _} (next sz x) =
   let Δ , cout , cz = !-reduction x in
   (s # _ :: Δ) , !-next cout , sz :: cz
@@ -218,7 +218,7 @@ m-split-split-r sp1 sp2 =
   -> Name k Γ (Chan #1 #0 t) _
   -> ∃[ Δ ] ((Γ == L? k => Δ) × CNull Δ)
 ?-reduction {_} {_ # _ :: Γ} {t} (here cz) =
-  (Chan #0 #0 t # _ :: Γ) , ?-here split10 , chan :: cz
+  (Chan #0 #0 t # _ :: Γ) , ?-here 1+0 , chan :: cz
 ?-reduction {_} {s # _ :: _} (next sz x) =
   let Δ , cinp , cz = ?-reduction x in
   (s # _ :: Δ) , ?-next cinp , sz :: cz

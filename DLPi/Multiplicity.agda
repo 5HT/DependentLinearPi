@@ -24,53 +24,53 @@ data Multiplicity : Set where
   #0 #1 #ω : Multiplicity
 
 data MScale : Multiplicity -> Multiplicity -> Set where
-  scale00 : MScale #0 #0
-  scale1ω : MScale #1 #ω
-  scaleωω : MScale #ω #ω
+  0·0 : MScale #0 #0
+  1·ω : MScale #1 #ω
+  ω·ω : MScale #ω #ω
 
 data MSplit : Multiplicity → Multiplicity → Multiplicity → Set where
-  split00 : MSplit #0 #0 #0
-  split01 : MSplit #1 #0 #1
-  split0ω : MSplit #ω #0 #ω
-  split10 : MSplit #1 #1 #0
-  split11 : MSplit #ω #1 #1
-  split1ω : MSplit #ω #1 #ω
-  splitω0 : MSplit #ω #ω #0
-  splitω1 : MSplit #ω #ω #1
-  splitωω : MSplit #ω #ω #ω
+  0+0 : MSplit #0 #0 #0
+  0+1 : MSplit #1 #0 #1
+  0+ω : MSplit #ω #0 #ω
+  1+0 : MSplit #1 #1 #0
+  1+1 : MSplit #ω #1 #1
+  1+ω : MSplit #ω #1 #ω
+  ω+0 : MSplit #ω #ω #0
+  ω+1 : MSplit #ω #ω #1
+  ω+ω : MSplit #ω #ω #ω
 
 msplit-l : (m : Multiplicity) -> MSplit m m #0
-msplit-l #0 = split00
-msplit-l #1 = split10
-msplit-l #ω = splitω0
+msplit-l #0 = 0+0
+msplit-l #1 = 1+0
+msplit-l #ω = ω+0
 
 msplit-r : (m : Multiplicity) -> MSplit m #0 m
-msplit-r #0 = split00
-msplit-r #1 = split01
-msplit-r #ω = split0ω
+msplit-r #0 = 0+0
+msplit-r #1 = 0+1
+msplit-r #ω = 0+ω
 
 msplit-comm : {m m1 m2 : Multiplicity} -> MSplit m m1 m2 -> MSplit m m2 m1
-msplit-comm split00 = split00
-msplit-comm split01 = split10
-msplit-comm split0ω = splitω0
-msplit-comm split10 = split01
-msplit-comm split11 = split11
-msplit-comm split1ω = splitω1
-msplit-comm splitω0 = split0ω
-msplit-comm splitω1 = split1ω
-msplit-comm splitωω = splitωω
+msplit-comm 0+0 = 0+0
+msplit-comm 0+1 = 1+0
+msplit-comm 0+ω = ω+0
+msplit-comm 1+0 = 0+1
+msplit-comm 1+1 = 1+1
+msplit-comm 1+ω = ω+1
+msplit-comm ω+0 = 0+ω
+msplit-comm ω+1 = 1+ω
+msplit-comm ω+ω = ω+ω
 
 msplit-comm-inv :
   {m m1 m2 : Multiplicity} -> (sp : MSplit m m1 m2) -> msplit-comm (msplit-comm sp) ≡ sp
-msplit-comm-inv split00 = refl
-msplit-comm-inv split01 = refl
-msplit-comm-inv split0ω = refl
-msplit-comm-inv split10 = refl
-msplit-comm-inv split11 = refl
-msplit-comm-inv split1ω = refl
-msplit-comm-inv splitω0 = refl
-msplit-comm-inv splitω1 = refl
-msplit-comm-inv splitωω = refl
+msplit-comm-inv 0+0 = refl
+msplit-comm-inv 0+1 = refl
+msplit-comm-inv 0+ω = refl
+msplit-comm-inv 1+0 = refl
+msplit-comm-inv 1+1 = refl
+msplit-comm-inv 1+ω = refl
+msplit-comm-inv ω+0 = refl
+msplit-comm-inv ω+1 = refl
+msplit-comm-inv ω+ω = refl
 
 msplit-comm-lr : (m : Multiplicity) -> msplit-comm (msplit-l m) ≡ msplit-r m
 msplit-comm-lr #0 = refl
@@ -82,33 +82,33 @@ msplit-assoc-rl :
   -> MSplit m m1 m23
   -> MSplit m23 m2 m3
   -> ∃[ n ] (MSplit m n m3 × MSplit n m1 m2)
-msplit-assoc-rl split00 split00 = #0 , split00 , split00
-msplit-assoc-rl split01 split01 = #0 , split01 , split00
-msplit-assoc-rl split01 split10 = #1 , split10 , split01
-msplit-assoc-rl split0ω split0ω = #0 , split0ω , split00
-msplit-assoc-rl split0ω split11 = #1 , split11 , split01
-msplit-assoc-rl split0ω split1ω = #1 , split1ω , split01
-msplit-assoc-rl split0ω splitω0 = #ω , splitω0 , split0ω
-msplit-assoc-rl split0ω splitω1 = #ω , splitω1 , split0ω
-msplit-assoc-rl split0ω splitωω = #ω , splitωω , split0ω
-msplit-assoc-rl split10 split00 = #1 , split10 , split10
-msplit-assoc-rl split11 split01 = #1 , split11 , split10
-msplit-assoc-rl split11 split10 = #ω , splitω0 , split11
-msplit-assoc-rl split1ω split0ω = #1 , split1ω , split10
-msplit-assoc-rl split1ω split11 = #ω , splitω1 , split11
-msplit-assoc-rl split1ω split1ω = #ω , splitωω , split11
-msplit-assoc-rl split1ω splitω0 = #ω , splitω0 , split1ω
-msplit-assoc-rl split1ω splitω1 = #ω , splitω1 , split1ω
-msplit-assoc-rl split1ω splitωω = #ω , splitωω , split1ω
-msplit-assoc-rl splitω0 split00 = #ω , splitω0 , splitω0
-msplit-assoc-rl splitω1 split01 = #ω , splitω1 , splitω0
-msplit-assoc-rl splitω1 split10 = #ω , splitω0 , splitω1
-msplit-assoc-rl splitωω split0ω = #ω , splitωω , splitω0
-msplit-assoc-rl splitωω split11 = #ω , splitω1 , splitω1
-msplit-assoc-rl splitωω split1ω = #ω , splitωω , splitω1
-msplit-assoc-rl splitωω splitω0 = #ω , splitω0 , splitωω
-msplit-assoc-rl splitωω splitω1 = #ω , splitω1 , splitωω
-msplit-assoc-rl splitωω splitωω = #ω , splitωω , splitωω
+msplit-assoc-rl 0+0 0+0 = #0 , 0+0 , 0+0
+msplit-assoc-rl 0+1 0+1 = #0 , 0+1 , 0+0
+msplit-assoc-rl 0+1 1+0 = #1 , 1+0 , 0+1
+msplit-assoc-rl 0+ω 0+ω = #0 , 0+ω , 0+0
+msplit-assoc-rl 0+ω 1+1 = #1 , 1+1 , 0+1
+msplit-assoc-rl 0+ω 1+ω = #1 , 1+ω , 0+1
+msplit-assoc-rl 0+ω ω+0 = #ω , ω+0 , 0+ω
+msplit-assoc-rl 0+ω ω+1 = #ω , ω+1 , 0+ω
+msplit-assoc-rl 0+ω ω+ω = #ω , ω+ω , 0+ω
+msplit-assoc-rl 1+0 0+0 = #1 , 1+0 , 1+0
+msplit-assoc-rl 1+1 0+1 = #1 , 1+1 , 1+0
+msplit-assoc-rl 1+1 1+0 = #ω , ω+0 , 1+1
+msplit-assoc-rl 1+ω 0+ω = #1 , 1+ω , 1+0
+msplit-assoc-rl 1+ω 1+1 = #ω , ω+1 , 1+1
+msplit-assoc-rl 1+ω 1+ω = #ω , ω+ω , 1+1
+msplit-assoc-rl 1+ω ω+0 = #ω , ω+0 , 1+ω
+msplit-assoc-rl 1+ω ω+1 = #ω , ω+1 , 1+ω
+msplit-assoc-rl 1+ω ω+ω = #ω , ω+ω , 1+ω
+msplit-assoc-rl ω+0 0+0 = #ω , ω+0 , ω+0
+msplit-assoc-rl ω+1 0+1 = #ω , ω+1 , ω+0
+msplit-assoc-rl ω+1 1+0 = #ω , ω+0 , ω+1
+msplit-assoc-rl ω+ω 0+ω = #ω , ω+ω , ω+0
+msplit-assoc-rl ω+ω 1+1 = #ω , ω+1 , ω+1
+msplit-assoc-rl ω+ω 1+ω = #ω , ω+ω , ω+1
+msplit-assoc-rl ω+ω ω+0 = #ω , ω+0 , ω+ω
+msplit-assoc-rl ω+ω ω+1 = #ω , ω+1 , ω+ω
+msplit-assoc-rl ω+ω ω+ω = #ω , ω+ω , ω+ω
 
 msplit-assoc-lr :
   ∀{m m12 m1 m2 m3}
