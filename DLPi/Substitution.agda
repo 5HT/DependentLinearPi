@@ -35,27 +35,27 @@ open import Weakening
 open import Scaling
 
 data Insert : ℕ -> (t : Type) -> ⟦ t ⟧ -> Context -> Context -> Set where
-  insert-here : ∀{Γ t v} -> Insert zero t v Γ (t # v :: Γ)
-  insert-next : ∀{Γ Δ t s v w k} -> Insert k t v Γ Δ -> Insert (suc k) t v (s # w :: Γ) (s # w :: Δ)
+  here : ∀{Γ t v} -> Insert zero t v Γ (t # v :: Γ)
+  next : ∀{Γ Δ t s v w k} -> Insert k t v Γ Δ -> Insert (suc k) t v (s # w :: Γ) (s # w :: Δ)
 
 split-insert : ∀{Γ Δ Δ1 Δ2 k t v}
   -> CSplit Δ Δ1 Δ2
   -> Insert k t v Γ Δ
   -> ∃[ t1 ] ∃[ t2 ] ∃[ Γ1 ] ∃[ Γ2 ] ∃[ v1 ] ∃[ v2 ]
      (TSplit t t1 t2 v v1 v2 × CSplit Γ Γ1 Γ2 × Insert k t1 v1 Γ1 Δ1 × Insert k t2 v2 Γ2 Δ2)
-split-insert (ts :: sp) insert-here =
-  _ , _ , _ , _ , _ , _ , ts , sp , insert-here , insert-here
-split-insert (ss :: sp) (insert-next ins) =
+split-insert (ts :: sp) here =
+  _ , _ , _ , _ , _ , _ , ts , sp , here , here
+split-insert (ss :: sp) (next ins) =
   let _ , _ , _ , _ , _ , _ , ts , sp' , ins1 , ins2 = split-insert sp ins in
-  _ , _ , _ , _ , _ , _ , ts , ss :: sp' , insert-next ins1 , insert-next ins2
+  _ , _ , _ , _ , _ , _ , ts , ss :: sp' , next ins1 , next ins2
 
 insert-null-null-null :
   ∀{k t Γ Δ v} ->
   Insert k t v Γ Δ ->
   CNull Δ ->
   TNull t × CNull Γ
-insert-null-null-null insert-here (tz :: cnull) = tz , cnull
-insert-null-null-null (insert-next ins) (sz :: cnull) =
+insert-null-null-null here (tz :: cnull) = tz , cnull
+insert-null-null-null (next ins) (sz :: cnull) =
   let tz , cnull' = insert-null-null-null ins cnull in
   tz , sz :: cnull'
 
@@ -162,28 +162,28 @@ subst-result :
   -> Insert l t v Γ Δ
   -> Name k Δ s w
   -> SubstitutionResult t v Γ Δ s w
-subst-result insert-here (here cnull) = found cnull
-subst-result insert-here (next tz x) = not-found tz x
-subst-result (insert-next ins) (here cnull) =
+subst-result here (here cnull) = found cnull
+subst-result here (next tz x) = not-found tz x
+subst-result (next ins) (here cnull) =
   let tz , cnull = insert-null-null-null ins cnull in
   not-found tz (here cnull)
-subst-result (insert-next ins) (next sz x) with subst-result ins x
+subst-result (next ins) (next sz x) with subst-result ins x
 ... | found cnull = found (sz :: cnull)
 ... | not-found tu y = not-found tu (next sz y)
 
 insert-null-weaken : ∀{k Γ Δ t v} -> TNull t -> Insert k t v Γ Δ -> Weaken k Γ Δ
-insert-null-weaken tz insert-here = here tz
-insert-null-weaken tz (insert-next ins) = next (insert-null-weaken tz ins)
+insert-null-weaken tz here = here tz
+insert-null-weaken tz (next ins) = next (insert-null-weaken tz ins)
 
 insert-scale :
   ∀{k t Γ' Δ Δ' v} ->
   Insert k t v Γ' Δ' ->
   CScale Δ Δ' ->
   ∃[ s ] ∃[ w ] ∃[ Γ ] (Insert k s w Γ Δ × TScale s t w v × CScale Γ Γ')
-insert-scale insert-here (tsc :: sc) = _ , _ , _ , insert-here , tsc , sc
-insert-scale (insert-next ins) (ssc :: sc) =
+insert-scale here (tsc :: sc) = _ , _ , _ , here , tsc , sc
+insert-scale (next ins) (ssc :: sc) =
   let _ , _ , _ , ins' , tsc , sc' = insert-scale ins sc in
-  _ , _ , _ , insert-next ins' , tsc , ssc :: sc'
+  _ , _ , _ , next ins' , tsc , ssc :: sc'
 
 subst-name :
   ∀{Γ Δ Γ1 Γ2 k l t s v w}
@@ -241,7 +241,7 @@ subst-process sp V ins (Recv {t = t} sp1 E f) with split-insert sp1 ins
   Recv sp' E
            λ v -> let _ , _ , snull , ts = tsplit-r (t .force) in
                   (subst-process (ts :: spP)
-                                 (weaken-term (here snull) V2) (insert-next insP) (f v))
+                                 (weaken-term (here snull) V2) (next insP) (f v))
 subst-process sp V ins (Par psp P Q) with split-insert psp ins
 ... | _ , _ , _ , _ , _ , _ , tsp , psp' , insP , insQ with split-term tsp V
 ... | _ , _ , esp' , V1 , V2 =
@@ -250,7 +250,7 @@ subst-process sp V ins (Par psp P Q) with split-insert psp ins
 subst-process sp e ins (New {_} {m} {n} P) =
   New (subst-process (split-c (msplit-r m) (msplit-r n) :: sp)
                      (weaken-term (here null-c) e)
-                     (insert-next ins) P)
+                     (next ins) P)
 subst-process sp e ins (Rep sc P) with insert-scale ins sc
 ... | _ , _ , _ , ins' , scale-p , sc2 =
   let _ , sc1 , F = scale-term scale-p e in
@@ -269,5 +269,5 @@ subst-process sp E ins (Let {t = t} {ft} sp1 F P) with split-insert sp1 ins
   Let sp' (subst-term sp1 E1 ins1 F)
           (subst-process (ts :: ds :: sp2)
             (weaken-term (here tnull) (weaken-term (here dnull) E2))
-            (insert-next (insert-next ins2))
+            (next (next ins2))
             P)

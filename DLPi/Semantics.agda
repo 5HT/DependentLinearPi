@@ -338,7 +338,7 @@ data _~~_~>_ : ∀{l Γ Δ} -> Process Γ -> (Γ == l => Δ) -> Process Δ -> Se
     let N = cast-term (cong (λ p -> p .force) teq) M in
     Par sp (Send sp1 (name x) M) (Recv sp2 (name y) F)
     ~~ α ~>
-    subst-process sp' N insert-here (F (cast-pure (cong (λ p -> p .force) teq) p))
+    subst-process sp' N here (F (cast-pure (cong (λ p -> p .force) teq) p))
   r-let :
     ∀{Γ Γ1 Γ2 Γ11 Γ12 t}
     (f   : ⟦ t ⟧ -> Type)
@@ -352,8 +352,8 @@ data _~~_~>_ : ∀{l Γ Δ} -> Process Γ -> (Γ == l => Δ) -> Process Δ -> Se
     let _ , sp1' , sp2' = csplit-assoc-lr sp1 (csplit-comm sp2) in
     let _ , _ , dnull , ds = tsplit-r (f p) in
     let M' = weaken-term (here dnull) M in
-    let P1 = subst-process (ds :: sp2') M' insert-here P in
-    Let sp1 (pair {f = f} sp2 M N) P ~~ tau ~> subst-process sp1' N insert-here P1
+    let P1 = subst-process (ds :: sp2') M' here P in
+    Let sp1 (pair {f = f} sp2 M N) P ~~ tau ~> subst-process sp1' N here P1
   r-par :
     ∀{Γ Γ1 Δ1 Γ2 l}
     {P  : Process Γ1}
