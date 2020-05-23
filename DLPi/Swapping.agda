@@ -47,11 +47,11 @@ swap-name-index (suc n) zero = zero
 swap-name-index (suc n) (suc k) = suc (swap-name-index n k)
 
 swap-name : ∀{k n Γ Δ t v} -> Swap n Γ Δ -> Name k Γ t v -> Name (swap-name-index n k) Δ t v
-swap-name swap-here (name-here (sz :: cz)) = name-next sz (name-here cz)
-swap-name swap-here (name-next tz (name-here cz)) = name-here (tz :: cz)
-swap-name swap-here (name-next tz (name-next sz x)) = name-next sz (name-next tz x)
-swap-name (swap-next sw) (name-here cz) = name-here (swap-null sw cz)
-swap-name (swap-next sw) (name-next tu x) = name-next tu (swap-name sw x)
+swap-name swap-here (here (sz :: cz)) = next sz (here cz)
+swap-name swap-here (next tz (here cz)) = here (tz :: cz)
+swap-name swap-here (next tz (next sz x)) = next sz (next tz x)
+swap-name (swap-next sw) (here cz) = here (swap-null sw cz)
+swap-name (swap-next sw) (next tu x) = next tu (swap-name sw x)
 
 swap-split :
   ∀{n Γ Γ1 Γ2 Δ}

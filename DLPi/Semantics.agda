@@ -207,9 +207,9 @@ m-split-split-r sp1 sp2 =
   ∀{k Γ t}
   -> Name k Γ (Chan #0 #1 t) _
   -> ∃[ Δ ] ((Γ == L! k => Δ) × CNull Δ)
-!-reduction {_} {_ # _ :: Γ} {t} (name-here cz) =
+!-reduction {_} {_ # _ :: Γ} {t} (here cz) =
   (Chan #0 #0 t # _ :: Γ) , !-here split10 , null-c :: cz
-!-reduction {_} {s # _ :: _} (name-next sz x) =
+!-reduction {_} {s # _ :: _} (next sz x) =
   let Δ , cout , cz = !-reduction x in
   (s # _ :: Δ) , !-next cout , sz :: cz
 
@@ -217,9 +217,9 @@ m-split-split-r sp1 sp2 =
   ∀{k Γ t}
   -> Name k Γ (Chan #1 #0 t) _
   -> ∃[ Δ ] ((Γ == L? k => Δ) × CNull Δ)
-?-reduction {_} {_ # _ :: Γ} {t} (name-here cz) =
+?-reduction {_} {_ # _ :: Γ} {t} (here cz) =
   (Chan #0 #0 t # _ :: Γ) , ?-here split10 , null-c :: cz
-?-reduction {_} {s # _ :: _} (name-next sz x) =
+?-reduction {_} {s # _ :: _} (next sz x) =
   let Δ , cinp , cz = ?-reduction x in
   (s # _ :: Δ) , ?-next cinp , sz :: cz
 
@@ -282,13 +282,13 @@ csplit-type-eq :
 csplit-type-eq (ts :: _)
                (ts1 :: _)
                (ts2 :: _)
-               (name-here _)
-               (name-here _) = tsplit-type-eq ts ts1 ts2
+               (here _)
+               (here _) = tsplit-type-eq ts ts1 ts2
 csplit-type-eq (_ :: sp)
                (_ :: sp1)
                (_ :: sp2)
-               (name-next _ x)
-               (name-next _ y) = csplit-type-eq sp sp1 sp2 x y
+               (next _ x)
+               (next _ y) = csplit-type-eq sp sp1 sp2 x y
 
 sync :
   ∀{k Γ Γ1 Γ2 Γ11 Γ12 Γ21 Γ22 t s} ->

@@ -27,8 +27,8 @@ open import Context
 module Language where
 
 data Name : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
-  name-here : ∀{Γ t p} -> CNull Γ -> Name zero (t # p :: Γ) t p
-  name-next : ∀{k Γ t s p q} -> TNull s -> Name k Γ t p -> Name (suc k) (s # q :: Γ) t p
+  here : ∀{Γ t p} -> CNull Γ -> Name zero (t # p :: Γ) t p
+  next : ∀{k Γ t s p q} -> TNull s -> Name k Γ t p -> Name (suc k) (s # q :: Γ) t p
 
 data Term : Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
   name : ∀{k Γ t p} -> Name k Γ t p -> Term Γ t p

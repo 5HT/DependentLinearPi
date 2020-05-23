@@ -60,8 +60,8 @@ insert-null-null-null (insert-next ins) (sz :: cnull) =
   tz , sz :: cnull'
 
 name-null-null : ∀{k Γ t v} -> Name k Γ t v -> TNull t -> CNull Γ
-name-null-null (name-here cnull) tz = tz :: cnull
-name-null-null (name-next sz x) tz = sz :: name-null-null x tz
+name-null-null (here cnull) tz = tz :: cnull
+name-null-null (next sz x) tz = sz :: name-null-null x tz
 
 term-null-null : ∀{Γ t v} -> Term Γ t v -> TNull t -> CNull Γ
 term-null-null (name x) tnull = name-null-null x tnull
@@ -71,10 +71,10 @@ split-name : ∀{k Γ t t1 t2 v v1 v2}
   -> TSplit t t1 t2 v v1 v2
   -> Name k Γ t v
   -> ∃[ Γ1 ] ∃[ Γ2 ] (CSplit Γ Γ1 Γ2 × Name k Γ1 t1 v1 × Name k Γ2 t2 v2)
-split-name tsp (name-here null) = _ , _ , tsp :: (c-null-split null) , name-here null , name-here null
-split-name tsp (name-next snull x) =
+split-name tsp (here null) = _ , _ , tsp :: (c-null-split null) , here null , here null
+split-name tsp (next snull x) =
   let _ , _ , sp , x1 , x2 = split-name tsp x in
-  _ , _ , t-null-split snull :: sp , name-next snull x1 , name-next snull x2
+  _ , _ , t-null-split snull :: sp , next snull x1 , next snull x2
 
 split-term :
   ∀{Γ t t1 t2 v v1 v2} ->
@@ -162,14 +162,14 @@ subst-result :
   -> Insert l t v Γ Δ
   -> Name k Δ s w
   -> SubstitutionResult t v Γ Δ s w
-subst-result insert-here (name-here cnull) = found cnull
-subst-result insert-here (name-next tz x) = not-found tz x
-subst-result (insert-next ins) (name-here cnull) =
+subst-result insert-here (here cnull) = found cnull
+subst-result insert-here (next tz x) = not-found tz x
+subst-result (insert-next ins) (here cnull) =
   let tz , cnull = insert-null-null-null ins cnull in
-  not-found tz (name-here cnull)
-subst-result (insert-next ins) (name-next sz x) with subst-result ins x
+  not-found tz (here cnull)
+subst-result (insert-next ins) (next sz x) with subst-result ins x
 ... | found cnull = found (sz :: cnull)
-... | not-found tu y = not-found tu (name-next sz y)
+... | not-found tu y = not-found tu (next sz y)
 
 insert-null-weaken : ∀{k Γ Δ t v} -> TNull t -> Insert k t v Γ Δ -> Weaken k Γ Δ
 insert-null-weaken tz insert-here = weaken-here tz

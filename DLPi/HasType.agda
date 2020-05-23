@@ -65,10 +65,10 @@ not-in-name-null :
   -> l ≢ k
   -> Lookup l Γ t v
   -> TNull t
-not-in-name-null (name-here _) nx ht-here = ⊥-elim (nx refl)
-not-in-name-null (name-here cz) _ (ht-next ht) = has-type-null ht cz
-not-in-name-null (name-next tnull _) _ ht-here = tnull
-not-in-name-null (name-next _ x) nx (ht-next ht) = not-in-name-null x (suc-≢ nx) ht
+not-in-name-null (here _) nx ht-here = ⊥-elim (nx refl)
+not-in-name-null (here cz) _ (ht-next ht) = has-type-null ht cz
+not-in-name-null (next tnull _) _ ht-here = tnull
+not-in-name-null (next _ x) nx (ht-next ht) = not-in-name-null x (suc-≢ nx) ht
 
 not-in-term-null :
   ∀{k Γ t s v w}

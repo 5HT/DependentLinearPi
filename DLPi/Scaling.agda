@@ -101,10 +101,10 @@ scale-name :
   TScale t s v w ->
   Name k Δ s w ->
   ∃[ Γ ] (CScale Γ Δ × Name k Γ t v)
-scale-name sc (name-here null) = _ , sc :: c-null-scale null , name-here null
-scale-name sc (name-next tnull x) =
+scale-name sc (here null) = _ , sc :: c-null-scale null , here null
+scale-name sc (next tnull x) =
   let _ , sc' , y = scale-name sc x in
-  _ , t-null-scale tnull :: sc' , name-next tnull y
+  _ , t-null-scale tnull :: sc' , next tnull y
 
 scale-term :
   ∀{Δ s t v w} ->

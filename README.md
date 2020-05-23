@@ -56,6 +56,11 @@ outline of the files and of their purpose:
 * [Weakening.agda](DLPi/Weakening.agda) Definition of `Weaken` and
   weakening properties for terms and processes.
 
+While reading the code, use of [Fira
+Code](https://github.com/tonsky/FiraCode) is recommended as it
+contains several ligatures that make the Agda code more pleasant to
+read.
+
 ## SessionTypes
 
 This folder contains **encoding** functions from (dependent) session
