@@ -28,8 +28,8 @@ open import Context
 open import Syntax
 
 data Swap : ℕ -> Context -> Context -> Set where
-  here : ∀{Γ t s v w} -> Swap zero (t # v :: (s # w :: Γ)) (s # w :: (t # v :: Γ))
-  next : ∀{n Γ Δ t v} -> Swap n Γ Δ -> Swap (suc n) (t # v :: Γ) (t # v :: Δ)
+  here : ∀{Γ t s p q} -> Swap zero (t # p :: (s # q :: Γ)) (s # q :: (t # p :: Γ))
+  next : ∀{n Γ Δ t p} -> Swap n Γ Δ -> Swap (suc n) (t # p :: Γ) (t # p :: Δ)
 
 swap-inv : ∀{n Γ Δ} -> Swap n Γ Δ -> Swap n Δ Γ
 swap-inv here = here
@@ -46,30 +46,34 @@ swap-name-index zero (suc (suc k)) = suc (suc k)
 swap-name-index (suc n) zero = zero
 swap-name-index (suc n) (suc k) = suc (swap-name-index n k)
 
-swap-name : ∀{k n Γ Δ t v} -> Swap n Γ Δ -> Name k Γ t v -> Name (swap-name-index n k) Δ t v
-swap-name here (here (sz :: cz)) = next sz (here cz)
-swap-name here (next tz (here cz)) = here (tz :: cz)
-swap-name here (next tz (next sz x)) = next sz (next tz x)
-swap-name (next sw) (here cz) = here (swap-null sw cz)
-swap-name (next sw) (next tu x) = next tu (swap-name sw x)
+swap-name :
+  ∀{k n Γ Δ t p} ->
+  Swap n Γ Δ ->
+  Name k Γ t p ->
+  Name (swap-name-index n k) Δ t p
+swap-name here (here (snull :: cnull)) = next snull (here cnull)
+swap-name here (next tnull (here cnull)) = here (tnull :: cnull)
+swap-name here (next tnull (next snull x)) = next snull (next tnull x)
+swap-name (next sw) (here cnull) = here (swap-null sw cnull)
+swap-name (next sw) (next tnull x) = next tnull (swap-name sw x)
 
 swap-split :
-  ∀{n Γ Γ1 Γ2 Δ}
-  -> Swap n Γ Δ
-  -> CSplit Γ Γ1 Γ2
-  -> ∃[ Δ1 ] ∃[ Δ2 ] (CSplit Δ Δ1 Δ2 × Swap n Γ1 Δ1 × Swap n Γ2 Δ2)
+  ∀{n Γ Γ1 Γ2 Δ} ->
+  Swap n Γ Δ ->
+  CSplit Γ Γ1 Γ2 ->
+  ∃[ Δ1 ] ∃[ Δ2 ] (CSplit Δ Δ1 Δ2 × Swap n Γ1 Δ1 × Swap n Γ2 Δ2)
 swap-split here (ts :: ss :: sp) =
   _ , _ , ss :: ts :: sp , here , here
 swap-split (next sw) (ts :: sp) =
   let _ , _ , sp , sw1 , sw2 = swap-split sw sp in
   _ , _ , ts :: sp , next sw1 , next sw2
 
-swap-term : ∀{n Γ Δ t v} -> Swap n Γ Δ -> Term Γ t v -> Term Δ t v
+swap-term : ∀{n Γ Δ t p} -> Swap n Γ Δ -> Term Γ t p -> Term Δ t p
 swap-term sw (name x) = name (swap-name sw x)
 swap-term sw (pure cnull c) = pure (swap-null sw cnull) c
-swap-term sw (pair sp E1 E2) =
+swap-term sw (pair sp M1 M2) =
   let _ , _ , sp' , sw1 , sw2 = swap-split sw sp in
-  pair sp' (swap-term sw1 E1) (swap-term sw2 E2)
+  pair sp' (swap-term sw1 M1) (swap-term sw2 M2)
 
 swap-scale : ∀{n Γ Γ' Δ'} -> Swap n Γ' Δ' -> CScale Γ Γ' -> ∃[ Δ ] (Swap n Γ Δ × CScale Δ Δ')
 swap-scale here (tsc :: ssc :: sc) =

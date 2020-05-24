@@ -108,7 +108,7 @@ strengthen-scale (next we) (tsc :: sc) =
   let _ , we' , sc' = strengthen-scale we sc in
   _ , next we' , tsc :: sc'
 
-{- NAMEIABLES -}
+{- NAMES -}
 
 weaken-name-index : ℕ -> ℕ -> ℕ
 weaken-name-index zero k = suc k
@@ -137,7 +137,7 @@ strengthen-name (here _) (next _ x) _ = x
 strengthen-name (next we) (here cnull) _ = here (strengthen-null we cnull)
 strengthen-name (next we) (next tu x) neq = next tu (strengthen-name we x (suc-≢ neq))
 
-{- VALUES -}
+{- TERMS -}
 
 data NotInTerm : ∀{Γ t v} -> ℕ -> Term Γ t v -> Set₁ where
   nin-v : ∀{Γ t v k n}{x : Name k Γ t v} -> n ≢ k -> NotInTerm n (name x)
