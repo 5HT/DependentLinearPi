@@ -37,11 +37,11 @@ data CSplit : Context → Context → Context → Set₁ where
 
 data CScale : Context -> Context -> Set₁ where
   []   : CScale [] []
-  _::_ : ∀{Γ Δ t s p w} -> TScale t s p w -> CScale Γ Δ -> CScale (t # p :: Γ) (s # w :: Δ)
+  _::_ : ∀{Γ Δ t s p q} -> TScale t s p q -> CScale Γ Δ -> CScale (t # p :: Γ) (s # q :: Δ)
 
 data Lookup : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
   here : ∀{Γ t p} -> Lookup zero (t # p :: Γ) t p
-  next : ∀{Γ t s p w k} -> Lookup k Γ t p -> Lookup (suc k) (s # w :: Γ) t p
+  next : ∀{Γ t s p q k} -> Lookup k Γ t p -> Lookup (suc k) (s # q :: Γ) t p
 
 c-null-null-split-null : ∀{Γ Γ1 Γ2} -> CNull Γ1 -> CNull Γ2 -> CSplit Γ Γ1 Γ2 -> CNull Γ
 c-null-null-split-null [] [] [] = []

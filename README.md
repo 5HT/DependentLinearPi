@@ -23,8 +23,8 @@ much more pleasant to read.
 * [Context.agda](DLPi/Context.agda) Definition of **contexts** and
   related properties, including `CNull`, `CScale` and `CSplit`.
 * [Syntax.agda](DLPi/Syntax.agda) Data types for representing
-  **terms** and **processes**. Look no further if you're looking for
-  `Name`, `Term` and `Process`.
+  **terms** and **processes**. Search no further if you're looking
+  for `Name`, `Term` and `Process`.
 * [Semantics.agda](DLPi/Semantics.agda) The **operational
   semantics** of DLπ, including structural pre-congruence and
   labelled reduction. Both definitions embed the property that they

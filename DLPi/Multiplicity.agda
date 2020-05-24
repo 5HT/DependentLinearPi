@@ -61,7 +61,7 @@ msplit-comm ω+1 = 1+ω
 msplit-comm ω+ω = ω+ω
 
 msplit-comm-inv :
-  {σ σ1 σ2 : Multiplicity} -> (sp : MSplit σ σ1 σ2) -> msplit-comm (msplit-comm sp) ≡ sp
+  ∀{σ σ1 σ2} -> (sp : MSplit σ σ1 σ2) -> msplit-comm (msplit-comm sp) ≡ sp
 msplit-comm-inv 0+0 = refl
 msplit-comm-inv 0+1 = refl
 msplit-comm-inv 0+ω = refl
@@ -78,10 +78,10 @@ msplit-comm-lr #1 = refl
 msplit-comm-lr #ω = refl
 
 msplit-assoc-rl :
-  ∀{σ σ1 σ23 σ2 m3}
-  -> MSplit σ σ1 σ23
-  -> MSplit σ23 σ2 m3
-  -> ∃[ ρ ] (MSplit σ ρ m3 × MSplit ρ σ1 σ2)
+  ∀{σ σ1 σ23 σ2 σ3} ->
+  MSplit σ σ1 σ23 ->
+  MSplit σ23 σ2 σ3 ->
+  ∃[ ρ ] (MSplit σ ρ σ3 × MSplit ρ σ1 σ2)
 msplit-assoc-rl 0+0 0+0 = #0 , 0+0 , 0+0
 msplit-assoc-rl 0+1 0+1 = #0 , 0+1 , 0+0
 msplit-assoc-rl 0+1 1+0 = #1 , 1+0 , 0+1
@@ -111,20 +111,20 @@ msplit-assoc-rl ω+ω ω+1 = #ω , ω+1 , ω+ω
 msplit-assoc-rl ω+ω ω+ω = #ω , ω+ω , ω+ω
 
 msplit-assoc-lr :
-  ∀{σ σ12 σ1 σ2 m3}
-  -> MSplit σ σ12 m3
-  -> MSplit σ12 σ1 σ2
-  -> ∃[ ρ ] (MSplit σ σ1 ρ × MSplit ρ σ2 m3)
+  ∀{σ σ12 σ1 σ2 σ3} ->
+  MSplit σ σ12 σ3 ->
+  MSplit σ12 σ1 σ2 ->
+  ∃[ ρ ] (MSplit σ σ1 ρ × MSplit ρ σ2 σ3)
 msplit-assoc-lr ms1 ms2 =
   let _ , ms1' , ms2' = msplit-assoc-rl (msplit-comm ms1) (msplit-comm ms2) in
   _ , msplit-comm ms1' , msplit-comm ms2'
 
 m-split-split-split :
-  ∀{ρ σ1 σ2 σ11 σ12 σ21 σ22}
-  -> MSplit ρ σ1 σ2
-  -> MSplit σ1 σ11 σ12
-  -> MSplit σ2 σ21 σ22
-  -> ∃[ ρ1 ] ∃[ ρ2 ] (MSplit ρ ρ1 ρ2 × MSplit ρ1 σ11 σ21 × MSplit ρ2 σ12 σ22)
+  ∀{ρ σ1 σ2 σ11 σ12 σ21 σ22} ->
+  MSplit ρ σ1 σ2 ->
+  MSplit σ1 σ11 σ12 ->
+  MSplit σ2 σ21 σ22 ->
+  ∃[ ρ1 ] ∃[ ρ2 ] (MSplit ρ ρ1 ρ2 × MSplit ρ1 σ11 σ21 × MSplit ρ2 σ12 σ22)
 m-split-split-split sp sp1 sp2 =
   let _ , sp1 , sp = msplit-assoc-lr sp sp1 in
   let _ , sp2 , sp = msplit-assoc-rl sp sp2 in
