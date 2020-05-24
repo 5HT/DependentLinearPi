@@ -18,6 +18,8 @@
 open import Data.Unit
 open import Data.Bool
 open import Data.Nat
+open import Relation.Nullary.Negation using (contraposition)
+open import Data.Nat.Properties using (0≢1+n; 1+n≢0; suc-injective)
 open import Data.Empty
 open import Data.Product
 open import Data.Maybe
@@ -119,9 +121,9 @@ weaken-name (next we) (here null) = here (weaken-null we null)
 weaken-name (next we) (next tnull x) = next tnull (weaken-name we x)
 
 not-in-weakened-name : ∀{k n Γ Δ t v} -> Weaken n Γ Δ -> Name k Γ t v -> n ≢ weaken-name-index n k
-not-in-weakened-name (here _) _ = zero-not-suc
-not-in-weakened-name (next _) (here _) = suc-not-zero
-not-in-weakened-name (next we) (next _ x) = ≢-suc (not-in-weakened-name we x)
+not-in-weakened-name (here _) _ = 0≢1+n
+not-in-weakened-name (next _) (here _) = 1+n≢0
+not-in-weakened-name (next we) (next _ x) = contraposition suc-injective (not-in-weakened-name we x)
 
 strengthen-name-index : (l : ℕ) -> (k : ℕ) -> l ≢ k -> ℕ
 strengthen-name-index zero zero neq = ⊥-elim (neq refl)
