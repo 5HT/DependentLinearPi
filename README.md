@@ -33,9 +33,7 @@ much more pleasant to read.
 ### Auxiliary modules
 
 * [Common.agda](DLPi/Common.agda) Some general purpose functions,
-  properties and axioms (extensionality). These are very likely to
-  be found somewhere in the standard library, but so far we've been
-  too lazy to look them up.
+  properties and axioms (extensionality).
 * [HasType.agda](DLPi/HasType.agda) Proof that a name not occurring
   in a well-typed process has a type that satisfies `TNull`, hence
   it is unrestricted.
