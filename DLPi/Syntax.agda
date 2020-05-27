@@ -15,9 +15,9 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-open import Data.Unit
-open import Data.Nat
-open import Data.Product
+open import Data.Unit using (⊤)
+open import Data.Nat using (ℕ; zero; suc)
+open import Data.Product using (_,_)
 open import Codata.Thunk
 
 open import Multiplicity

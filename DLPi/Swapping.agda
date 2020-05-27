@@ -15,12 +15,8 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-open import Data.Nat
+open import Data.Nat using (ℕ; zero; suc)
 open import Data.Product using (_×_; _,_; ∃; ∃-syntax)
-open import Data.Maybe
-
-import Relation.Binary.PropositionalEquality as Eq
-open Eq using (_≡_; _≢_; refl; subst; cong; cong₂; sym)
 
 open import Multiplicity
 open import Type
