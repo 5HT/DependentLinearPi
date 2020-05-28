@@ -15,14 +15,11 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-open import Data.Empty
-open import Data.Unit
-open import Data.Bool
+open import Data.Empty using (⊥-elim)
+open import Data.Unit using (tt)
 open import Data.Nat
 open import Data.Product
-open import Data.Sum
-import Relation.Binary.PropositionalEquality as Eq
-open Eq using (_≢_; refl)
+open import Relation.Binary.PropositionalEquality using (_≢_; refl)
 open import Relation.Nullary using (¬_)
 open import Codata.Thunk
 
@@ -31,6 +28,10 @@ open import Language
 open import Split
 open import Scale
 open import Weaken
+
+data Lookup : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
+  here : ∀{Γ t p} -> Lookup zero (t # p :: Γ) t p
+  next : ∀{Γ t s p q k} -> Lookup k Γ t p -> Lookup (suc k) (s # q :: Γ) t p
 
 has-type-split :
   ∀{Γ Γ1 Γ2 k t v} ->
@@ -58,22 +59,22 @@ has-type-scale (next ht) (tsc :: sc) =
   _ , _ , ssc , next ht'
 
 not-in-name-null :
-  ∀{k l Γ t s v w}
-  -> Name k Γ s w
-  -> l ≢ k
-  -> Lookup l Γ t v
-  -> TNull t
+  ∀{k l Γ t s v w} ->
+  Name k Γ s w ->
+  l ≢ k ->
+  Lookup l Γ t v ->
+  TNull t
 not-in-name-null (here _) nx here = ⊥-elim (nx refl)
 not-in-name-null (here cz) _ (next ht) = has-type-null ht cz
 not-in-name-null (next tnull _) _ here = tnull
 not-in-name-null (next _ x) nx (next ht) = not-in-name-null x (suc-≢ nx) ht
 
 not-in-term-null :
-  ∀{k Γ t s v w}
-  -> {V : Term Γ s w}
-  -> NotInTerm k V
-  -> Lookup k Γ t v
-  -> TNull t
+  ∀{k Γ t s v w} ->
+  {V : Term Γ s w} ->
+  NotInTerm k V ->
+  Lookup k Γ t v ->
+  TNull t
 not-in-term-null (nin-v {x = x} nx) ht = not-in-name-null x nx ht
 not-in-term-null (nin-n cnull _) ht = has-type-null ht cnull
 not-in-term-null (nin-p sp nie1 nie2) ht =
@@ -87,11 +88,11 @@ witness (Chan _ _ _) = tt
 witness (Pair t f) = let v = witness t in v , witness (f v)
 
 not-in-process-null :
-  ∀{k Γ t v}
-  -> {P : Process Γ}
-  -> NotInProcess k P
-  -> Lookup k Γ t v
-  -> TNull t
+  ∀{k Γ t v} ->
+  {P : Process Γ} ->
+  NotInProcess k P ->
+  Lookup k Γ t v ->
+  TNull t
 not-in-process-null {P = Idle cnull} _ ht = has-type-null ht cnull
 not-in-process-null (nin-send sp ne1 ne2) ht =
   let _ , _ , _ , _ , ts , ht1 , ht2 = has-type-split ht sp in
