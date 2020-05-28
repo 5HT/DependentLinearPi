@@ -22,21 +22,18 @@ open import Function using (_$_)
 open import Data.Empty
 open import Data.Unit
 open import Data.Maybe
-open import Size
 open import Data.Bool
 open import Data.Nat
-
-open import Multiplicity
-open import Type
-open import Context
-open import Syntax
-open import Weakening
-open import HasType
-open import Substitution
-
 open import Codata.Thunk
-open import ReducibleNormalForm
 open import Data.Product
+
+open import Language
+open import Weaken
+open import Lookup
+open import Substitution
+open import Reduction
+open import Split
+open import ReducibleNormalForm
 
 {- SERVER THAT COMPUTES THE SUCCESSOR OF A NATURAL NUMBER -}
 successor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ))) # _ :: [])

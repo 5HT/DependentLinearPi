@@ -23,17 +23,13 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
 open import Codata.Thunk
 
-open import Multiplicity
-open import Type
-open import Context
-open import Syntax
-open import Multiplicity
-open import Type
-open import Context
-open import Semantics
+open import Language
+open import Congruence
+open import Reduction
 open import PrefixedBy
 open import PrefixNormalForm
-open import Weakening
+open import Split
+open import Weaken
 open import Substitution
 
 data ReducibleNormalForm : ∀{Γ} -> ℕ -> Process Γ -> Set where

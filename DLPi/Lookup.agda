@@ -27,11 +27,10 @@ open import Relation.Nullary using (¬_)
 open import Codata.Thunk
 
 open import Common
-open import Multiplicity
-open import Type
-open import Context
-open import Syntax
-open import Weakening
+open import Language
+open import Split
+open import Scale
+open import Weaken
 
 has-type-split :
   ∀{Γ Γ1 Γ2 k t v} ->

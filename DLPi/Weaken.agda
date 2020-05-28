@@ -27,29 +27,32 @@ open import Size
 open import Codata.Thunk
 
 open import Common
-open import Multiplicity
-open import Type
-open import Context
-open import Syntax
+open import Language
+open import Split
+open import Scale
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; subst; cong; cong₂; sym)
+
+module Weaken where
 
 data Weaken : ℕ -> Context -> Context -> Set₁ where
   here : ∀{Γ t v} -> TNull t -> Weaken zero Γ (t # v :: Γ)
   next : ∀{n Γ Δ mt v} -> Weaken n Γ Δ -> Weaken (suc n) (mt # v :: Γ) (mt # v :: Δ)
 
-{- NULL AND UNRESTRICTED -}
+{- Weaken Null => Null -}
 
 weaken-null : ∀{n Γ Δ} -> Weaken n Γ Δ -> CNull Γ -> CNull Δ
 weaken-null (here tnull) null = tnull :: null
 weaken-null (next we) (tnull :: null) = tnull :: weaken-null we null
 
+{- Strengthen Null => Null -}
+
 strengthen-null : ∀{n Γ Δ} -> Weaken n Γ Δ -> CNull Δ -> CNull Γ
 strengthen-null (here _) (_ :: cnull) = cnull
 strengthen-null (next we) (tz :: cnull) = tz :: strengthen-null we cnull
 
--- {- SPLIT WEAKENING AND STRENGTHENING -}
+{- Weaken Split => Split Weaken Weaken -}
 
 weaken-split :
   ∀{n Γ Γ1 Γ2 Δ}
@@ -61,6 +64,8 @@ weaken-split (here tz) sp =
 weaken-split (next we) (ts :: sp) =
   let _ , _ , sp' , we1 , we2 = weaken-split we sp in
   _ , _ , ts :: sp' , next we1 , next we2
+
+{- Strengthen Split => Split Strengthen Strengthen -}
 
 strengthen-split :
   ∀{n Γ Δ Δ1 Δ2}
@@ -86,6 +91,8 @@ strengthen-split-eq (next we) (ts :: sp) =
   let _ , sp' , we' = strengthen-split-eq we sp in
   _ , ts :: sp' , next we'
 
+{- Weaken Scale => Weaken Scale -}
+
 weaken-scale :
   ∀{n Γ Γ' Δ'} ->
   Weaken n Γ' Δ' ->
@@ -96,6 +103,8 @@ weaken-scale (here tnull) cscale =
 weaken-scale (next we) (tscale :: cscale) =
   let _ , we' , cscale' = weaken-scale we cscale in
   _ , next we' , tscale :: cscale'
+
+{- Strengthen Scale => Strengthen Scale -}
 
 strengthen-scale :
   ∀{n Γ' Δ Δ'} ->

@@ -15,31 +15,34 @@ much more pleasant to read.
 
 ### Primary modules
 
-* [Multiplicity.agda](DLPi/Multiplicity.agda) Representation of
-  **multiplicities** and their properties, including `MScale` and
-  `MSplit`.
-* [Type.agda](DLPi/Type.agda) Definition of DLπ **types** and their
-  properties, including `TNull`, `TScale` and `TSplit`.
-* [Context.agda](DLPi/Context.agda) Definition of **contexts** and
-  related properties, including `CNull`, `CScale` and `CSplit`.
-* [Syntax.agda](DLPi/Syntax.agda) Data types for representing
+* [Language.agda](DLPi/Language.agda) Data types for representing
   **terms** and **processes**. Search no further if you're looking
-  for `Name`, `Term` and `Process`.
-* [Semantics.agda](DLPi/Semantics.agda) The **operational
-  semantics** of DLπ, including structural pre-congruence and
-  labelled reduction. Both definitions embed the property that they
-  preserve typing.
+  for `Name`, `Term` and `Process`. This module also includes the
+  definition of `Multiplicity`, `Type` and `Context`, as well as the
+  `Null` predicate and the `Scale` and `Split` relations for
+  multiplicities, types and contexts.
+* [Congruence.agda](DLPi/Congruence.agda) Definition of **structural
+  pre-congruence** and related type preservation result.
+* [Reduction.agda](DLPi/Reduction.agda) Definition of **labelled
+  reduction** and corresponding typing preservation result.
 
 ### Auxiliary modules
 
 * [Common.agda](DLPi/Common.agda) Some general purpose functions,
   properties and axioms (extensionality).
-* [HasType.agda](DLPi/HasType.agda) Proof that a name not occurring
-  in a well-typed process has a type that satisfies `TNull`, hence
-  it is unrestricted.
-* [Main.agda](DLPi/Main.agda) Container for a few **examples**, but
-  mostly useful as root file that triggers the type checking of
-  everything.
+* [Split.agda](DLPi/Split.agda) Properties of splitting for
+  multiplicities, types and contexts.
+* [Scale.agda](DLPi/Scale.agda) Properties of scaling for
+  multiplicities, types and contexts.
+* [Swap.agda](DLPi/Swap.agda) Some auxiliary properties about
+  swapping names in a context.
+* [Weaken.agda](DLPi/Weaken.agda) Definition of `Weaken`,
+  **weakening** and **strengthening** properties for terms and
+  processes.
+* [Substitution.agda](DLPi/Substitution.agda) Type-preserving
+  **substitution** of terms for variables in processes.
+* [Lookup.agda](DLPi/Lookup.agda) Proof that a name not occurring in
+  a well-typed process has an unrestricted type.
 * [PrefixNormalForm.agda](DLPi/PrefixNormalForm.agda) Proof that
   every process can be rewritten in prefix-normal-form using
   structural pre-congruence.
@@ -50,12 +53,9 @@ much more pleasant to read.
   given channel can be rewritten in reducible normal form using
   structural pre-congruence. In this normal form, the two prefixes
   sit next to each other, so the process is ready to reduce.
-* [Substitution.agda](DLPi/Substitution.agda) **Substitution** of
-  terms for variables in processes.
-* [Swapping.agda](DLPi/Swapping.agda) Some auxiliary properties
-  about swapping names in a context.
-* [Weakening.agda](DLPi/Weakening.agda) Definition of `Weaken` and
-  weakening properties for terms and processes.
+* [Main.agda](DLPi/Main.agda) Container for a few **examples**, but
+  mostly useful as root file that triggers the type checking of
+  everything.
 
 ## SessionTypes
 

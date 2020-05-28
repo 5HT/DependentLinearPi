@@ -15,7 +15,6 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-open import Data.Maybe
 open import Data.Empty
 open import Data.Nat
 open import Data.Product
@@ -24,13 +23,12 @@ open Eq using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
 open import Codata.Thunk
 
 open import Common
-open import Multiplicity
-open import Type
-open import Context
-open import Syntax
-open import Semantics
+open import Language
+open import Congruence
 open import PrefixedBy
-open import Weakening
+open import Split
+open import Scale
+open import Weaken
 
 data PrefixNormalForm : ∀{Γ} -> ℕ -> Multiplicity -> Multiplicity -> Process Γ -> Set where
   pnf-send :

@@ -15,7 +15,6 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-open import Data.Empty
 open import Data.Nat
 open import Data.Product
 import Relation.Binary.PropositionalEquality as Eq
@@ -23,13 +22,14 @@ open Eq using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
 open import Codata.Thunk
 
 open import Common
-open import Multiplicity
-open import Type
-open import Context
-open import Syntax
-open import Semantics
-open import Swapping
-open import Weakening
+open import Language
+open import Congruence
+open import Swap
+open import Split
+open import Scale
+open import Weaken
+
+module PrefixedBy where
 
 data PrefixedBy : ∀{Γ} -> ℕ -> Multiplicity -> Multiplicity -> Process Γ -> Set where
   prefixed-send :

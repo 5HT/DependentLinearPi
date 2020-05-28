@@ -18,10 +18,9 @@
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Product using (_×_; _,_; ∃; ∃-syntax)
 
-open import Multiplicity
-open import Type
-open import Context
-open import Syntax
+open import Language
+
+module Swap where
 
 data Swap : ℕ -> Context -> Context -> Set where
   here : ∀{Γ t s p q} -> Swap zero (t # p :: (s # q :: Γ)) (s # q :: (t # p :: Γ))

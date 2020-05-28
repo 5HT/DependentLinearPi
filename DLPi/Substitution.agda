@@ -27,11 +27,10 @@ open Eq using (_≡_; _≢_; refl; cong; cong₂; sym; subst)
 open import Relation.Binary.HeterogeneousEquality using (_≅_)
 
 open import Common
-open import Multiplicity
-open import Type
-open import Context
-open import Syntax
-open import Weakening
+open import Language
+open import Split
+open import Scale
+open import Weaken
 
 data Insert : ℕ -> (t : Type) -> ⟦ t ⟧ -> Context -> Context -> Set where
   here : ∀{Γ t v} -> Insert zero t v Γ (t # v :: Γ)
