@@ -15,14 +15,10 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq using (_≡_; _≢_; refl; cong; cong₂; sym; subst; subst₂)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Function using (_$_)
 
-open import Data.Empty
-open import Data.Unit
-open import Data.Maybe
-open import Data.Bool
+open import Data.Empty using (⊥-elim)
 open import Data.Nat
 open import Codata.Thunk
 open import Data.Product
@@ -47,7 +43,6 @@ successor =
   Send (pure :: chan 0+0 1+0 :: pure :: chan 0+0 0+0 :: [])
        (name (next pure (here (pure :: chan :: []))))
        (pure (pure :: chan :: pure :: chan :: []) (suc x))
-
 
 {- SERVER THAT COMPUTES THE PREDECESSOR OF A NON-NULL NATURAL NUMBER -}
 predecessor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Pair (Pure (n ≢ 0)) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ)))) # _ :: [])

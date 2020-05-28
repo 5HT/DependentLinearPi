@@ -29,6 +29,8 @@ open import Split
 open import Scale
 open import Weaken
 
+module Lookup where
+
 data Lookup : ℕ -> Context -> (t : Type) -> ⟦ t ⟧ -> Set₁ where
   here : ∀{Γ t p} -> Lookup zero (t # p :: Γ) t p
   next : ∀{Γ t s p q k} -> Lookup k Γ t p -> Lookup (suc k) (s # q :: Γ) t p
