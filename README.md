@@ -99,6 +99,8 @@ Each subfolder is organized as follows:
 
 ## References
 
-The formalization is described in the paper **A Dependently Typed
-Linear π-Calculus in Agda**, which appears in the proceedings of
-[PPDP 2020](http://www.cse.chalmers.se/~abela/ppdp20/).
+The formalization of DLπ is described in the paper **A Dependently
+Typed Linear π-Calculus in Agda**, which appears in the proceedings
+of [PPDP 2020](http://www.cse.chalmers.se/~abela/ppdp20/). A
+preprint version of the paper can be found
+[here](http://hdl.handle.net/2318/1739403).
