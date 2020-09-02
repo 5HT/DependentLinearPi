@@ -53,6 +53,11 @@ much more pleasant to read.
   given channel can be rewritten in reducible normal form using
   structural pre-congruence. In this normal form, the two prefixes
   sit next to each other, so the process is ready to reduce.
+* [Results.agda](DLPi/Results.agda) This module collects all the
+  **properties** stated in Section 4 of the paper. Compared to their
+  formulation in the paper, the statements are slightly differnt
+  and/or simpler to account for the fact that terms and processes
+  are intrinsically typed.
 * [Main.agda](DLPi/Main.agda) Container for a few **examples**, but
   mostly useful as root file that triggers the type checking of
   everything.
@@ -91,3 +96,9 @@ Each subfolder is organized as follows:
   one the **inverse** of the other modulo bisimilarity.
 * `Equalities.agda`, if present, contains examples illustrating
   the fact that the encoding function is **not injective**.
+
+## References
+
+The formalization is described in the paper **A Dependently Typed
+Linear π-Calculus in Agda**, which appears in the proceedings of
+[PPDP 2020](http://www.cse.chalmers.se/~abela/ppdp20/).

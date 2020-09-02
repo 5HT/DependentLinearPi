@@ -30,6 +30,7 @@ open import Substitution
 open import Reduction
 open import Split
 open import ReducibleNormalForm
+open import Results
 
 {- SERVER THAT COMPUTES THE SUCCESSOR OF A NATURAL NUMBER -}
 successor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ))) # _ :: [])
