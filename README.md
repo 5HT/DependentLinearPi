@@ -1,4 +1,4 @@
-# A Dependently-Typed Linear π-Calculus in Agda
+# A Dependently Typed Linear π-Calculus in Agda
 
 DLπ is an Agda formalization of the **linear π-calculus** with
 **dependent pairs**. It allows for the modeling of structured
