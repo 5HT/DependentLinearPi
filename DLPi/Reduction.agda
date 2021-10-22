@@ -17,8 +17,7 @@
 
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Product using (∃-syntax; _×_; _,_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst₂; cong)
-open import Codata.Thunk
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst₂)
 
 open import Language
 open import Split
@@ -212,14 +211,14 @@ data _~~_~>_ : ∀{l Γ Δ} -> Process Γ -> (Γ == l => Δ) -> Process Δ -> Se
     (sp2 : CSplit Γ2 Γ21 Γ22)
     (x   : Name k Γ11 (Chan #0 #1 t) _)
     (y   : Name k Γ21 (Chan #1 #0 s) _)
-    (M   : Term Γ12 (t .force) p)
-    (F   : (w : ⟦ s .force ⟧) -> Process (s .force # w :: Γ22)) ->
+    (M   : Term Γ12 t p)
+    (F   : (w : ⟦ s ⟧) -> Process (s # w :: Γ22)) ->
     let _ , α , sp' = sync sp sp1 sp2 x y in
     let teq = csplit-type-eq sp sp1 sp2 x y in
-    let N = cast-term (cong (λ p -> p .force) teq) M in
+    let N = cast-term teq M in
     Par sp (Send sp1 (name x) M) (Recv sp2 (name y) F)
     ~~ α ~>
-    subst-process sp' N here (F (cast-pure (cong (λ p -> p .force) teq) p))
+    subst-process sp' N here (F (cast-pure teq p))
   r-let :
     ∀{Γ Γ1 Γ2 Γ11 Γ12 t}
     (f   : ⟦ t ⟧ -> Type)

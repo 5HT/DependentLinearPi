@@ -21,7 +21,6 @@ open import Relation.Nullary.Negation using (contraposition)
 open import Data.Nat.Properties using (0≢1+n; 1+n≢0; suc-injective)
 open import Data.Empty using (⊥-elim)
 open import Data.Product
-open import Codata.Thunk
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
 open import Common
@@ -57,7 +56,7 @@ data NotInProcess : ∀{Γ} -> ℕ -> Process Γ -> Set₁ where
     {cnull : CNull Γ} ->
     NotInProcess n (Idle cnull)
   nin-send :
-    ∀{Γ Γ1 Γ2 k t v}{M : Term Γ1 (Chan #0 #1 t) _}{N : Term Γ2 (t .force) v} ->
+    ∀{Γ Γ1 Γ2 k t v}{M : Term Γ1 (Chan #0 #1 t) _}{N : Term Γ2 t v} ->
     (sp : CSplit Γ Γ1 Γ2) ->
     NotInTerm k M ->
     NotInTerm k N ->
@@ -66,7 +65,7 @@ data NotInProcess : ∀{Γ} -> ℕ -> Process Γ -> Set₁ where
     ∀{Γ Γ1 Γ2 t k F}{e : Term Γ1 (Chan #1 #0 t) _} ->
     (sp : CSplit Γ Γ1 Γ2) ->
     NotInTerm k e ->
-    ((x : ⟦ t .force ⟧) -> NotInProcess (suc k) (F x)) ->
+    ((x : ⟦ t ⟧) -> NotInProcess (suc k) (F x)) ->
     NotInProcess k (Recv sp e F)
   nin-par :
     ∀{Γ Γ1 Γ2 k P Q} ->

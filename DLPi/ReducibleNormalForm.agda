@@ -21,7 +21,6 @@ open import Data.Nat
 open import Data.Product
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
-open import Codata.Thunk
 
 open import Language
 open import Congruence
@@ -40,8 +39,8 @@ data ReducibleNormalForm : ∀{Γ} -> ℕ -> Process Γ -> Set where
     -> (sp2 : CSplit Γ2 Γ21 Γ22)
     -> (x   : Name k Γ11 (Chan #0 #1 t) _)
     -> (y   : Name k Γ21 (Chan #1 #0 s) _)
-    -> (V   : Term Γ12 (t .force) v)
-    -> (g   : (v : ⟦ s .force ⟧) -> Process (s .force # v :: Γ22))
+    -> (V   : Term Γ12 t v)
+    -> (g   : (v : ⟦ s ⟧) -> Process (s # v :: Γ22))
     -> ReducibleNormalForm k (Par sp (Send sp1 (name x) V) (Recv sp2 (name y) g))
   rnf-par :
     ∀{Γ Γ1 Γ2 k}{P : Process Γ1}{Q : Process Γ2}

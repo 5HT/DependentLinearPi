@@ -19,7 +19,6 @@ open import Data.Nat
 open import Data.Product
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
-open import Codata.Thunk
 
 open import Common
 open import Language
@@ -33,7 +32,7 @@ module PrefixedBy where
 
 data PrefixedBy : ∀{Γ} -> ℕ -> Multiplicity -> Multiplicity -> Process Γ -> Set where
   prefixed-send :
-    ∀{k Γ Γ1 Γ2 t v}{x : Name k Γ1 (Chan #0 #1 t) _}{V : Term Γ2 (t .force) v}
+    ∀{k Γ Γ1 Γ2 t v}{x : Name k Γ1 (Chan #0 #1 t) _}{V : Term Γ2 t v}
     -> (sp : CSplit Γ Γ1 Γ2)
     -> PrefixedBy k #0 #1 (Send sp (name x) V)
   prefixed-recv :

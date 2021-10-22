@@ -21,7 +21,6 @@ open import Data.Nat
 open import Data.Product
 open import Relation.Binary.PropositionalEquality using (_≢_; refl)
 open import Relation.Nullary using (¬_)
-open import Codata.Thunk
 
 open import Common
 open import Language
@@ -102,7 +101,7 @@ not-in-process-null (nin-send sp ne1 ne2) ht =
 not-in-process-null (nin-recv {t = t} sp niE nig) ht =
   let _ , _ , _ , _ , ts , htE , htP = has-type-split ht sp in
   t-null-null-split-null (not-in-term-null niE htE)
-                         (not-in-process-null (nig (witness (t .force))) (next htP)) ts
+                         (not-in-process-null (nig (witness t)) (next htP)) ts
   -- Applying f to a single witness suffices because the type
   -- which we want to prove unrestricted is always the same and
   -- does not depend on the witness
