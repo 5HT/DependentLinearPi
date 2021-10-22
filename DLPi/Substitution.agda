@@ -18,7 +18,6 @@
 open import Data.Unit
 open import Data.Nat
 open import Data.Product
-open import Codata.Thunk
 open import Data.Maybe
 
 import Relation.Binary.PropositionalEquality as Eq
@@ -258,7 +257,7 @@ subst-process sp V ins (Recv {t = t} sp1 E f) with split-insert sp1 ins
   let _ , _ , sp' , spE , spP = c-split-split-split sp esp' sp1' in
   let E = subst-term spE V1 inse E in
   Recv sp' E
-           λ v -> let _ , _ , snull , ts = tsplit-r (t .force) in
+           λ v -> let _ , _ , snull , ts = tsplit-r t in
                   (subst-process (ts :: spP)
                                  (weaken-term (here snull) V2) (next insP) (f v))
 subst-process sp V ins (Par psp P Q) with split-insert psp ins

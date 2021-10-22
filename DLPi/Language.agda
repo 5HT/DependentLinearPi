@@ -15,11 +15,9 @@
 {-                                                                   -}
 {- Copyright 2020 Luca Ciccone, Luca Padovani                        -}
 
-open import Size using (Size; ∞)
 open import Data.Unit using (⊤; tt)
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Product using (Σ; _,_)
-open import Codata.Thunk
 
 module Language where
 
@@ -31,31 +29,16 @@ data Multiplicity : Set where
 {- Type -}
 
 mutual
-  data PreType : Size → Set₁ where
-    Pure : ∀{i} → Set → PreType i
-    Chan : ∀{i} → Multiplicity → Multiplicity → Thunk PreType i → PreType i
-    Pair : ∀{i} → (t : PreType i) → (f : ⟦ t ⟧ → PreType i) → PreType i
+  data Type : Set₁ where
+    Pure : Set → Type
+    Chan : Multiplicity → Multiplicity → Type → Type
+    Pair : (t : Type) → (f : ⟦ t ⟧ → Type) → Type
 
   {- Interpretation : datatype → type -}
-  ⟦_⟧ : ∀{i} → PreType i → Set
+  ⟦_⟧ : Type → Set
   ⟦ Pure A ⟧     = A
   ⟦ Chan _ _ _ ⟧ = ⊤
   ⟦ Pair t f ⟧   = Σ ⟦ t ⟧ λ x → ⟦ f x ⟧
-
-UnfoldedType : Set₁
-UnfoldedType = ∀{i} → PreType i
-
-FoldedType : Set₁
-FoldedType = ∀{i} → Thunk PreType i
-
-fold : UnfoldedType → FoldedType
-fold t = λ where .force → t
-
-unfold : FoldedType → UnfoldedType
-unfold t = t .force
-
-Type : Set₁
-Type = PreType ∞
 
 {- Context -}
 
@@ -137,9 +120,9 @@ data Term : Context → (t : Type) → ⟦ t ⟧ → Set₁ where
 data Process : Context → Set₁ where
   Idle : ∀{Γ} → CNull Γ → Process Γ
   Send : ∀{Γ Γ1 Γ2 t p} → CSplit Γ Γ1 Γ2 → Term Γ1 (Chan #0 #1 t) _ →
-         Term Γ2 (t .force) p → Process Γ
+         Term Γ2 t p → Process Γ
   Recv : ∀{Γ Γ1 Γ2 t} → CSplit Γ Γ1 Γ2 → Term Γ1 (Chan #1 #0 t) _ →
-         ((x : ⟦ t .force ⟧) → Process (t .force # x :: Γ2)) →
+         ((x : ⟦ t ⟧) → Process (t # x :: Γ2)) →
          Process Γ
   Par  : ∀{Γ Γ1 Γ2} → CSplit Γ Γ1 Γ2 → Process Γ1 → Process Γ2 →
          Process Γ

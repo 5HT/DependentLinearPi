@@ -20,7 +20,6 @@ open import Function using (_$_)
 
 open import Data.Empty using (⊥-elim)
 open import Data.Nat
-open import Codata.Thunk
 open import Data.Product
 
 open import Language
@@ -33,7 +32,7 @@ open import ReducibleNormalForm
 open import Results
 
 {- SERVER THAT COMPUTES THE SUCCESSOR OF A NATURAL NUMBER -}
-successor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ))) # _ :: [])
+successor : Process (Chan #ω #0 (Pair (Pure ℕ) (λ _ -> Chan #0 #1 (Pure ℕ))) # _ :: [])
 successor =
   Rep (chan 1·ω 0·0 :: []) $
   Recv (chan 1+0 0+0 :: [])
@@ -46,7 +45,7 @@ successor =
        (pure (pure :: chan :: pure :: chan :: []) (suc x))
 
 {- SERVER THAT COMPUTES THE PREDECESSOR OF A NON-NULL NATURAL NUMBER -}
-predecessor : Process (Chan #ω #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Pair (Pure (n ≢ 0)) (λ _ -> Chan #0 #1 (λ where .force -> Pure ℕ)))) # _ :: [])
+predecessor : Process (Chan #ω #0 (Pair (Pure ℕ) (λ n -> Pair (Pure (n ≢ 0)) (λ _ -> Chan #0 #1 (Pure ℕ)))) # _ :: [])
 predecessor =
   Rep (chan 1·ω 0·0 :: []) $
   Recv (chan 1+0 0+0 :: [])
@@ -64,15 +63,15 @@ predecessor =
     checked-pred zero p = ⊥-elim (p refl)
     checked-pred (suc x) _ = x
 
-data-type : (n : ℕ) -> ∀{i} -> Thunk PreType i
-data-type zero = λ where .force -> Pure ℕ
-data-type (suc n) = λ where .force -> Pair (Pure ℕ) (λ _ -> Chan #1 #0 (data-type n))
+data-type : (n : ℕ) -> Type
+data-type zero = Pure ℕ
+data-type (suc n) = Pair (Pure ℕ) (λ _ -> Chan #1 #0 (data-type n))
 
-send-type : ∀{i} -> PreType i
-send-type = Chan #0 #1 (λ where .force -> Pair (Pure ℕ) (λ n -> Chan #1 #0 (data-type n)))
+send-type : Type
+send-type = Chan #0 #1 (Pair (Pure ℕ) (λ n -> Chan #1 #0 (data-type n)))
 
-recv-type : ∀{i} -> PreType i
-recv-type = Chan #1 #0 (λ where .force -> Pair (Pure ℕ) (λ n -> Chan #1 #0 (data-type n)))
+recv-type : Type
+recv-type = Chan #1 #0 (Pair (Pure ℕ) (λ n -> Chan #1 #0 (data-type n)))
 
 {- PROCESSO THAT SENDS N FOLLOWED BY N MESSAGES -}
 
@@ -126,7 +125,7 @@ recv =
 
 {- CERTIFIED ECHO SERVER -}
 
-echo : Process (Chan #ω #0 (fold (Pair (Pure ℕ) (λ x -> Chan #0 #1 (fold (Pair (Pure ℕ) λ y -> Pure (x ≡ y)))))) # _ :: [])
+echo : Process (Chan #ω #0 (Pair (Pure ℕ) (λ x -> Chan #0 #1 (Pair (Pure ℕ) λ y -> Pure (x ≡ y)))) # _ :: [])
 echo = Rep ((chan 1·ω 0·0) :: []) $
        Recv (chan 1+0 0+0 :: [])
             (name (here []))

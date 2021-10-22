@@ -26,7 +26,7 @@ open import SessionTypes.FinLabels.Encode
 open import SessionTypes.FinLabels.Decode
 open import SessionTypes.FinLabels.Encoding
 
-module Sessiontypes.FinLabels.Proofs where
+module SessionTypes.FinLabels.Proofs where
 
 mutual
   dec-enc-base : (τ : BaseType) → τ ≡ ⌈ base-image τ ⌉-base

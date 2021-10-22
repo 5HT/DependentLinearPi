@@ -20,7 +20,6 @@ open import Data.Nat
 open import Data.Product
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
-open import Codata.Thunk
 
 open import Common
 open import Language
@@ -34,13 +33,13 @@ data PrefixNormalForm : ∀{Γ} -> ℕ -> Multiplicity -> Multiplicity -> Proces
   pnf-send :
     ∀{k Γ Γ1 Γ2 t v}
      {x : Name k Γ1 (Chan #0 #1 t) _}
-     {V : Term Γ2 (t .force) v}
+     {V : Term Γ2 t v}
     -> (sp : CSplit Γ Γ1 Γ2)
     -> PrefixNormalForm k #0 #1 (Send sp (name x) V)
   pnf-recv :
     ∀{k Γ Γ1 Γ2 t}
      {x : Name k Γ1 (Chan #1 #0 t) _}
-     {g : (v : ⟦ t .force ⟧) -> Process (t .force # v :: Γ2)}
+     {g : (v : ⟦ t ⟧) -> Process (t # v :: Γ2)}
     -> (sp : CSplit Γ Γ1 Γ2)
     -> PrefixNormalForm k #1 #0 (Recv sp (name x) g)
   pnf-par :
